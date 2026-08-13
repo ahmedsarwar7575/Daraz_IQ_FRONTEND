@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'https://daraz-mcp-backend.onrender.com/api'
+const API_URL = import.meta.env.VITE_API_URL || 'https://api.daraziq.store/api'
 const TOKEN_KEY = 'daraz_console_session'
 const USER_KEY = 'daraz_console_user'
 export const SESSION_EXPIRED_EVENT = 'sellerdesk:session-expired'

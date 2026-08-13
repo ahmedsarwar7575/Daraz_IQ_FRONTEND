@@ -101,7 +101,14 @@ const ProviderPanel = ({
     </div>
     <div className="grid gap-4 px-5 py-5 md:grid-cols-2">
       <Field label="Model" value={model} onChange={onModel} placeholder={modelPlaceholder} />
-      <Field label="API key" type="password" value={apiKey} onChange={onKey} placeholder={keyPlaceholder} autoComplete="off" />
+      <div>
+        <Field label="API key" type="password" value={apiKey} onChange={onKey} placeholder={keyPlaceholder} autoComplete="off" />
+        {(status?.hasUserKey || status?.hasPlatformKey) && !apiKey && (
+          <p className="mt-2 text-xs font-medium text-[#66717c]">
+            Saved key: <span className="font-mono">************</span> {status?.hasUserKey ? '(user key)' : '(platform key)'}
+          </p>
+        )}
+      </div>
     </div>
     <div className="flex flex-col justify-between gap-3 border-t border-[#e2e5e9] px-5 py-4 sm:flex-row sm:items-center">
       <div className="flex items-center gap-2 text-xs text-[#7c8690]">

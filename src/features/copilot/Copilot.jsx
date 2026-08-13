@@ -8,12 +8,14 @@ import {
   CircleAlert,
   ClipboardList,
   Copy,
+  ExternalLink,
   Gauge,
   KeyRound,
   LineChart,
   Loader2,
   Package,
   Percent,
+  PieChart,
   RefreshCw,
   Save,
   Search,
@@ -133,7 +135,135 @@ const formatDate = (value) => {
   }).format(new Date(value))
 }
 
+const formatNumber = (value) => {
+  const number = Number(value)
+  if (!Number.isFinite(number)) return '-'
+  return new Intl.NumberFormat('en').format(number)
+}
+
 const shortId = (value) => value ? `${String(value).slice(0, 8)}...` : 'Session user'
+
+const EmptyPanel = ({ children }) => (
+  <div className="grid min-h-[150px] place-items-center rounded-md border border-dashed border-[#d8dde3] bg-[#fbfcfd] px-5 text-center text-sm text-[#7c8690]">
+    {children}
+  </div>
+)
+
+const MiniBars = ({ items = [], valueKey = 'orders', color = '#27745d' }) => {
+  const max = Math.max(1, ...items.map((item) => Number(item[valueKey]) || 0))
+  if (!items.some((item) => Number(item[valueKey]) > 0)) return <EmptyPanel>No chart data available for this period.</EmptyPanel>
+  return (
+    <div className="flex h-48 items-end gap-1.5 rounded-md border border-[#e1e5e9] bg-[#fbfcfd] px-3 py-3">
+      {items.map((item) => {
+        const value = Number(item[valueKey]) || 0
+        return (
+          <div key={item.date || item.label} className="flex min-w-0 flex-1 flex-col items-center gap-2">
+            <div className="flex h-36 w-full items-end">
+              <div
+                className="w-full rounded-t-sm transition"
+                title={`${item.date || item.label}: ${value}`}
+                style={{ height: `${Math.max(3, (value / max) * 100)}%`, backgroundColor: color }}
+              />
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+const DistributionBars = ({ products = [] }) => {
+  const prices = products.map((product) => Number(product.price)).filter(Number.isFinite).slice(0, 14)
+  const max = Math.max(1, ...prices)
+  if (!prices.length) return <EmptyPanel>No competitor prices loaded yet.</EmptyPanel>
+  return (
+    <div className="flex h-44 items-end gap-2 rounded-md border border-[#e1e5e9] bg-[#fbfcfd] px-4 py-4">
+      {prices.map((price, index) => (
+        <div key={`${price}-${index}`} className="flex min-w-0 flex-1 flex-col items-center gap-2">
+          <div className="flex h-32 w-full items-end">
+            <div
+              className="w-full rounded-t-sm bg-[#d94c06] transition hover:bg-[#b83f04]"
+              title={formatCurrency(price)}
+              style={{ height: `${Math.max(8, (price / max) * 100)}%` }}
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+const FormattedBrief = ({ text }) => {
+  const clean = String(text || '').replace(/\*\*/g, '').replace(/\\\*/g, '*').trim()
+  if (!clean) return <p className="text-sm leading-6 text-[#7c8690]">No brief generated yet.</p>
+  const lines = clean.split('\n').map((line) => line.trim()).filter(Boolean)
+  return (
+    <div className="space-y-3">
+      {lines.map((line, index) => {
+        const heading = /^(executive summary|what changed|recommended actions|risk checks|pricing rationale)$/i.test(line.replace(':', ''))
+        const bullet = /^[-*]\s+/.test(line) || /^\d+\.\s+/.test(line)
+        if (heading) {
+          return <h3 key={`${line}-${index}`} className="pt-1 text-sm font-semibold uppercase text-[#171c22]">{line.replace(':', '')}</h3>
+        }
+        return (
+          <p key={`${line}-${index}`} className={cx('text-sm leading-6 text-[#3f4953]', bullet && 'pl-3')}>
+            {line.replace(/^[-*]\s+/, '')}
+          </p>
+        )
+      })}
+    </div>
+  )
+}
+
+const CompetitorTable = ({ products = [], empty = 'No competitor products loaded yet.' }) => (
+  <div className="overflow-x-auto">
+    <table className="w-full min-w-[820px] text-left text-sm">
+      <thead className="border-b border-[#e2e5e9] bg-[#f8f9fa] text-xs font-semibold uppercase text-[#858e97]">
+        <tr>
+          <th className="px-5 py-3">Listing</th>
+          <th className="px-5 py-3">Price</th>
+          <th className="px-5 py-3">Sold</th>
+          <th className="px-5 py-3">Reviews</th>
+          <th className="px-5 py-3">Location</th>
+          <th className="px-5 py-3">Link</th>
+        </tr>
+      </thead>
+      <tbody className="divide-y divide-[#eef0f2]">
+        {products.slice(0, 12).map((product) => (
+          <tr key={product.itemId || product.productUrl || product.title} className="bg-white transition hover:bg-[#f8fbfd]">
+            <td className="px-5 py-3">
+              <div className="flex items-center gap-3">
+                {product.imageUrl
+                  ? <img src={product.imageUrl} alt="" className="h-11 w-11 rounded-md object-cover" />
+                  : <span className="h-11 w-11 rounded-md bg-[#edf1f4]" />}
+                <div className="min-w-0">
+                  <p className="max-w-[430px] truncate font-medium text-[#2e3943]">{product.title}</p>
+                  <p className="mt-1 text-xs text-[#8a939c]">Rank {product.rank || '-'}</p>
+                </div>
+              </div>
+            </td>
+            <td className="px-5 py-3 font-semibold">{formatCurrency(product.price)}</td>
+            <td className="px-5 py-3 text-[#53606c]">{formatNumber(product.soldCount)}</td>
+            <td className="px-5 py-3 text-[#53606c]">{formatNumber(product.reviewCount)}</td>
+            <td className="px-5 py-3 text-[#53606c]">{product.location || '-'}</td>
+            <td className="px-5 py-3">
+              {product.productUrl ? (
+                <a href={product.productUrl} target="_blank" rel="noreferrer" className="inline-flex h-8 items-center gap-1.5 rounded-md border border-[#d5dae0] px-2.5 text-xs font-semibold text-[#3f4953] transition hover:-translate-y-0.5 hover:bg-[#f8f9fa]">
+                  Open <ExternalLink size={13} />
+                </a>
+              ) : '-'}
+            </td>
+          </tr>
+        ))}
+        {!products.length && (
+          <tr>
+            <td className="px-5 py-10 text-center text-sm text-[#7c8690]" colSpan={6}>{empty}</td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  </div>
+)
 
 const Button = ({ icon: Icon, children, loading, tone = 'store', variant = 'primary', ...props }) => {
   const style = featureStyles[tone] || featureStyles.store
@@ -289,9 +419,7 @@ const AiBrief = ({ result, loading, onGenerate, tone, disabled }) => (
           {result.warning}
         </div>
       )}
-      <p className="whitespace-pre-line text-sm leading-6 text-[#3f4953]">
-        {result?.brief || 'No brief generated yet.'}
-      </p>
+      <FormattedBrief text={result?.brief} />
     </div>
   </section>
 )
@@ -310,12 +438,14 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
   const [loadingProducts, setLoadingProducts] = useState(true)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+  const [dateRange, setDateRange] = useState({ days: 7, from: '', to: '' })
+  const [productSearch, setProductSearch] = useState('')
   const [marketForm, setMarketForm] = useState({
-    query: 'T shirt',
+    query: '',
     productId: '',
-    sku: 'demo-shirt-001',
-    currentPrice: '899',
-    cost: '700',
+    sku: '',
+    currentPrice: '',
+    cost: '',
     limit: 12,
   })
   const [guardrailForm, setGuardrailForm] = useState({
@@ -337,13 +467,24 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
   const activeFeature = showSwitcher ? localFeature : initialFeature
   const activeMeta = features.find((feature) => feature.id === activeFeature) || features[0]
   const ActiveIcon = activeMeta.icon
+  const filteredProducts = useMemo(() => {
+    const term = productSearch.trim().toLowerCase()
+    if (!term) return products
+    return products.filter((product) => `${product.title || ''} ${product.sku || ''} ${product.itemId || ''}`.toLowerCase().includes(term))
+  }, [products, productSearch])
+
+  const rangePayload = () => ({
+    days: Number(dateRange.days || 7),
+    ...(dateRange.from ? { from: dateRange.from } : {}),
+    ...(dateRange.to ? { to: dateRange.to } : {}),
+  })
 
   const selectProduct = useCallback((product, showNotice = true) => {
     setMarketForm((current) => ({
       ...current,
-      query: product.query || product.title,
+      query: product.query || product.title || '',
       productId: product.itemId || product.sku,
-      sku: product.sku,
+      sku: product.sku || '',
       currentPrice: String(product.price || ''),
       cost: String(product.cost || ''),
     }))
@@ -376,6 +517,15 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
     setMarketForm((current) => ({ ...current, [field]: event.target.value }))
   }
 
+  const updateRange = (field) => (event) => {
+    const value = event.target.value
+    setDateRange((current) => ({
+      ...current,
+      [field]: value,
+      ...(field === 'days' ? { from: '', to: '' } : {}),
+    }))
+  }
+
   const updateGuardrail = (field) => (event) => {
     const value = field === 'liveWritesEnabled' ? event.target.checked : event.target.value
     setGuardrailForm((current) => ({ ...current, [field]: value }))
@@ -399,11 +549,11 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
   }
 
   const reviewStore = () => run('store', async () => {
-    setStoreReview(await copilotApi.analyzeStore({ days: 7 }))
+    setStoreReview(await copilotApi.analyzeStore(rangePayload()))
   })
 
   const generateStoreBrief = () => run('aiStore', async () => {
-    const result = await copilotApi.aiBrief({ mode: 'store', days: 7 })
+    const result = await copilotApi.aiBrief({ mode: 'store', ...rangePayload() })
     setAiResult('store', result)
     setStoreReview(result.data)
   })
@@ -422,6 +572,7 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
       ...marketForm,
       productId: marketForm.productId || marketForm.sku,
       limit: Number(marketForm.limit),
+      refresh: true,
     })
     setProductAnalysis(result)
     setCompetitors(result.competitors)
@@ -433,6 +584,7 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
       ...marketForm,
       productId: marketForm.productId || marketForm.sku,
       limit: Number(marketForm.limit),
+      refresh: true,
     })
     setAiResult('product', result)
     setProductAnalysis(result.data)
@@ -446,6 +598,7 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
       currentPrice: marketForm.currentPrice,
       cost: marketForm.cost,
       limit: Number(marketForm.limit),
+      refresh: true,
     }))
   })
 
@@ -457,6 +610,7 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
       currentPrice: marketForm.currentPrice,
       cost: marketForm.cost,
       limit: Number(marketForm.limit),
+      refresh: true,
     })
     setAiResult('pricing', result)
     setPriceAnalysis(result.data)
@@ -498,14 +652,16 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
               <p className="mt-1.5 max-w-2xl text-sm leading-6 text-[#687480]">{activeMeta.description}</p>
             </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <span className="inline-flex h-9 items-center gap-2 rounded-md border border-[#d6dce2] bg-white px-3 text-xs font-semibold text-[#3f4953] shadow-sm">
-              <Bot size={15} /> {primitiveCounts.tools} tools
-            </span>
-            <span className="inline-flex h-9 items-center gap-2 rounded-md border border-[#d6dce2] bg-white px-3 text-xs font-semibold text-[#3f4953] shadow-sm">
-              <Server size={15} /> OAuth MCP
-            </span>
-          </div>
+          {activeFeature === 'mcp' && (
+            <div className="flex flex-wrap gap-2">
+              <span className="inline-flex h-9 items-center gap-2 rounded-md border border-[#d6dce2] bg-white px-3 text-xs font-semibold text-[#3f4953] shadow-sm">
+                <Bot size={15} /> {primitiveCounts.tools} tools
+              </span>
+              <span className="inline-flex h-9 items-center gap-2 rounded-md border border-[#d6dce2] bg-white px-3 text-xs font-semibold text-[#3f4953] shadow-sm">
+                <Server size={15} /> OAuth MCP
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -529,8 +685,8 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
           <section className="overflow-hidden border border-[#dfe3e8] bg-white shadow-[0_10px_28px_rgba(21,26,33,0.04)]">
             <div className="flex flex-col justify-between gap-4 border-b border-[#e2e5e9] px-5 py-4 sm:flex-row sm:items-center">
               <div>
-                <h2 className="text-base font-semibold">Seven-day review</h2>
-                <p className="mt-1 text-xs text-[#7c8690]">Live metrics, source sync, anomaly signals</p>
+                <h2 className="text-base font-semibold">Store review</h2>
+                <p className="mt-1 text-xs text-[#7c8690]">Live metrics, date range, source sync, anomaly signals</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button icon={BarChart3} tone="store" loading={working === 'store'} onClick={reviewStore}>
@@ -541,8 +697,17 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
                 </Button>
               </div>
             </div>
+            <div className="grid gap-4 border-b border-[#e2e5e9] px-5 py-5 sm:grid-cols-3">
+              <Select label="Range" value={dateRange.days} onChange={updateRange('days')}>
+                <option value={7}>Last 7 days</option>
+                <option value={30}>Last 30 days</option>
+                <option value={90}>Last 90 days</option>
+              </Select>
+              <Field label="From" type="date" value={dateRange.from} onChange={updateRange('from')} />
+              <Field label="To" type="date" value={dateRange.to} onChange={updateRange('to')} />
+            </div>
             <div className="grid gap-px bg-[#e5e8eb] sm:grid-cols-2 xl:grid-cols-4">
-              <MetricTile tone="store" icon={BarChart3} label="Orders" value={storeReview?.metrics?.orders ?? '-'} detail="7 days" />
+              <MetricTile tone="store" icon={BarChart3} label="Orders" value={formatNumber(storeReview?.metrics?.orders)} detail={`${dateRange.days || 7} days`} />
               <MetricTile tone="store" icon={Tags} label="Revenue" value={formatCurrency(storeReview?.metrics?.revenue)} detail="Finance" />
               <MetricTile tone="store" icon={Percent} label="Cancel" value={storeReview?.metrics?.cancelRate ?? '-'} detail="Rate" />
               <MetricTile tone="store" icon={Activity} label="Sources" value={`${storeReview?.sourceSummary?.synced ?? 0}/${storeReview?.sourceSummary?.total ?? 3}`} detail="Synced" />
@@ -559,6 +724,29 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
                 </div>
               )}
               <InsightList items={storeReview?.recommendations || []} empty="Run a store review to load findings." />
+            </div>
+            <div className="grid gap-5 border-t border-[#e2e5e9] px-5 py-5 xl:grid-cols-2">
+              <div>
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <h3 className="text-sm font-semibold text-[#171c22]">Daily orders</h3>
+                  <LineChart size={17} className="text-[#27745d]" />
+                </div>
+                <MiniBars items={storeReview?.charts?.dailyOrders || []} color="#27745d" />
+              </div>
+              <div>
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <h3 className="text-sm font-semibold text-[#171c22]">Order statuses</h3>
+                  <PieChart size={17} className="text-[#27745d]" />
+                </div>
+                <div className="space-y-2 rounded-md border border-[#e1e5e9] bg-[#fbfcfd] p-4">
+                  {(storeReview?.charts?.statusBreakdown || []).length ? (storeReview.charts.statusBreakdown.map((item) => (
+                    <div key={item.status} className="flex items-center justify-between gap-3 text-sm">
+                      <span className="capitalize text-[#53606c]">{item.status}</span>
+                      <span className="font-semibold text-[#171c22]">{formatNumber(item.count)}</span>
+                    </div>
+                  ))) : <EmptyPanel>No status data available for this range.</EmptyPanel>}
+                </div>
+              </div>
             </div>
           </section>
 
@@ -596,19 +784,32 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
             </div>
 
             <div className="border-b border-[#e2e5e9] px-5 py-5">
-              <div className="mb-3 flex items-center justify-between gap-3">
+              <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
                 <div>
                   <h3 className="text-sm font-semibold text-[#171c22]">Your products</h3>
                   <p className="mt-1 text-xs text-[#7c8690]">
-                    {loadingProducts ? 'Loading seller snapshots...' : `${products.length} seller snapshots available`}
+                    {loadingProducts ? 'Loading Daraz catalog...' : `${filteredProducts.length} of ${products.length} products shown`}
                   </p>
                 </div>
-                {loadingProducts
-                  ? <Loader2 size={18} className="animate-spin text-[#2e6f9e]" />
-                  : <Package size={18} className="text-[#2e6f9e]" />}
+                <div className="flex items-center gap-3">
+                  <input
+                    value={productSearch}
+                    onChange={(event) => setProductSearch(event.target.value)}
+                    placeholder="Search by product name or SKU"
+                    className="h-10 w-full rounded-md border border-[#d9dde3] bg-white px-3 text-sm text-[#171c22] transition placeholder:text-[#9ca4ae] focus:border-[#f85606] focus:outline-none focus:ring-2 focus:ring-[#fdd8c6] sm:w-72"
+                  />
+                  {loadingProducts
+                    ? <Loader2 size={18} className="animate-spin text-[#2e6f9e]" />
+                    : <Package size={18} className="text-[#2e6f9e]" />}
+                </div>
               </div>
+              {!loadingProducts && !products.length && (
+                <div className="mb-4 rounded-md border border-[#efc9c1] bg-[#fff6f3] px-4 py-3 text-sm text-[#983720]">
+                  No real Daraz products were returned yet. Reconnect Daraz or check that Product API permission is enabled for your Daraz app.
+                </div>
+              )}
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                {products.slice(0, 6).map((product) => (
+                {filteredProducts.slice(0, 9).map((product) => (
                   <button
                     key={product.id || product.sku}
                     onClick={() => selectProduct(product)}
@@ -643,6 +844,11 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
                     No product snapshots yet.
                   </div>
                 )}
+                {!loadingProducts && products.length > 0 && !filteredProducts.length && (
+                  <div className="rounded-md border border-[#dfe3e8] bg-white p-4 text-sm text-[#7c8690]">
+                    No product matches that search.
+                  </div>
+                )}
               </div>
             </div>
 
@@ -659,46 +865,6 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
               <MetricTile tone="product" icon={Gauge} label="P25" value={formatCurrency(competitors?.metrics?.p25Price)} detail="Aggressive band" />
               <MetricTile tone="product" icon={Percent} label="Priced" value={`${competitors?.metrics?.pricedCount ?? 0}/${competitors?.metrics?.count ?? 0}`} detail={competitors?.source || 'No snapshot'} />
               <MetricTile tone="product" icon={LineChart} label="Cached" value={formatDate(competitors?.cachedUntil)} detail={formatDate(competitors?.scrapedAt)} />
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[760px] text-left text-sm">
-                <thead className="border-b border-[#e2e5e9] bg-[#f8f9fa] text-xs font-semibold uppercase text-[#858e97]">
-                  <tr>
-                    <th className="px-5 py-3">Listing</th>
-                    <th className="px-5 py-3">Price</th>
-                    <th className="px-5 py-3">Sold</th>
-                    <th className="px-5 py-3">Reviews</th>
-                    <th className="px-5 py-3">Location</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#eef0f2]">
-                  {(competitors?.products || []).slice(0, 8).map((product) => (
-                    <tr key={product.itemId || product.productUrl || product.title} className="bg-white transition hover:bg-[#f8fbfd]">
-                      <td className="px-5 py-3">
-                        <div className="flex items-center gap-3">
-                          {product.imageUrl
-                            ? <img src={product.imageUrl} alt="" className="h-10 w-10 rounded-md object-cover" />
-                            : <span className="h-10 w-10 rounded-md bg-[#edf1f4]" />}
-                          <div className="min-w-0">
-                            <p className="max-w-[420px] truncate font-medium text-[#2e3943]">{product.title}</p>
-                            <p className="mt-1 text-xs text-[#8a939c]">Rank {product.rank}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-5 py-3 font-semibold">{formatCurrency(product.price)}</td>
-                      <td className="px-5 py-3 text-[#53606c]">{product.soldCount ?? '-'}</td>
-                      <td className="px-5 py-3 text-[#53606c]">{product.reviewCount ?? '-'}</td>
-                      <td className="px-5 py-3 text-[#53606c]">{product.location || '-'}</td>
-                    </tr>
-                  ))}
-                  {!competitors?.products?.length && (
-                    <tr>
-                      <td className="px-5 py-10 text-center text-sm text-[#7c8690]" colSpan={5}>No competitor snapshot loaded.</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
             </div>
           </section>
 
@@ -725,6 +891,17 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
               onGenerate={generateProductBrief}
             />
           </div>
+
+          <section className="overflow-hidden border border-[#dfe3e8] bg-white shadow-[0_10px_28px_rgba(21,26,33,0.04)]">
+            <div className="flex flex-col justify-between gap-4 border-b border-[#e2e5e9] px-5 py-4 sm:flex-row sm:items-center">
+              <div>
+                <h2 className="text-base font-semibold">Competitor products</h2>
+                <p className="mt-1 text-xs text-[#7c8690]">Scraped Daraz market listings with prices and source links</p>
+              </div>
+              {competitors?.warning && <span className="rounded-md bg-[#fff6f3] px-3 py-2 text-xs font-medium text-[#983720]">{competitors.warning}</span>}
+            </div>
+            <CompetitorTable products={competitors?.products || []} />
+          </section>
         </div>
       )}
 
@@ -762,6 +939,26 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
               <MetricTile tone="pricing" icon={Percent} label="Position" value={priceAnalysis?.pricePercentile ?? '-'} detail="Competitor percentile" />
               <MetricTile tone="pricing" icon={ShieldCheck} label="Audit" value={repriceResult?.log?.status || '-'} detail={repriceResult?.message || 'No price logged'} />
             </div>
+            <div className="grid gap-5 border-t border-[#e2e5e9] px-5 py-5 xl:grid-cols-[0.85fr_1.15fr]">
+              <div>
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <h3 className="text-sm font-semibold text-[#171c22]">Competitor price spread</h3>
+                  <PieChart size={17} className="text-[#d94c06]" />
+                </div>
+                <DistributionBars products={priceAnalysis?.competitors?.products || []} />
+              </div>
+              <div>
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <h3 className="text-sm font-semibold text-[#171c22]">Pricing rationale</h3>
+                  <LineChart size={17} className="text-[#d94c06]" />
+                </div>
+                <div className="space-y-2 rounded-md border border-[#e1e5e9] bg-[#fbfcfd] p-4">
+                  {(priceAnalysis?.rationale || []).length ? priceAnalysis.rationale.map((item) => (
+                    <p key={item} className="text-sm leading-6 text-[#4d5863]">{item}</p>
+                  )) : <EmptyPanel>Run price analysis to calculate guardrails and market rationale.</EmptyPanel>}
+                </div>
+              </div>
+            </div>
           </section>
 
           <div className="grid gap-7 xl:grid-cols-[1fr_390px]">
@@ -797,6 +994,14 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
               disabled={!marketForm.currentPrice}
             />
           </div>
+
+          <section className="overflow-hidden border border-[#dfe3e8] bg-white shadow-[0_10px_28px_rgba(21,26,33,0.04)]">
+            <div className="border-b border-[#e2e5e9] px-5 py-4">
+              <h2 className="text-base font-semibold">Competitor products</h2>
+              <p className="mt-1 text-xs text-[#7c8690]">Listings used for the pricing recommendation</p>
+            </div>
+            <CompetitorTable products={priceAnalysis?.competitors?.products || []} empty="Run price analysis to load competitor products." />
+          </section>
         </div>
       )}
 

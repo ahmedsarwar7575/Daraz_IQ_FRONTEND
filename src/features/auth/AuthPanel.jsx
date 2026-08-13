@@ -9,7 +9,6 @@ import {
   LockKeyhole,
   Mail,
   ShieldCheck,
-  Store,
   User,
 } from 'lucide-react'
 import { authApi } from '../../shared/api'
@@ -68,6 +67,15 @@ const Input = ({ icon: Icon, label, ...props }) => (
       <input className="min-w-0 flex-1 bg-transparent text-sm text-[#151a21] outline-none placeholder:text-[#9ca4ae]" {...props} />
     </span>
   </label>
+)
+
+const Brand = ({ dark = false }) => (
+  <div className="flex min-w-0 items-center gap-3">
+    <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-md border border-white/15 bg-white shadow-sm">
+      <img src="/favicon.svg" alt="" className="h-full w-full object-cover object-center" />
+    </span>
+    <span className={`text-base font-semibold ${dark ? 'text-white' : 'text-[#18232c]'}`}>daraziq.store</span>
+  </div>
 )
 
 function AuthPanel({ onAuthenticated }) {
@@ -160,20 +168,15 @@ function AuthPanel({ onAuthenticated }) {
       <div className="mx-auto grid min-h-[calc(100vh-24px)] max-w-6xl overflow-hidden rounded-lg border border-[#dfe3e8] bg-white shadow-[0_18px_50px_rgba(27,35,45,0.08)] sm:min-h-[calc(100vh-40px)] lg:grid-cols-[1.05fr_0.95fr]">
         <section className="relative hidden flex-col justify-between overflow-hidden bg-[#18232c] p-10 text-white lg:flex">
           <div className="absolute inset-x-0 bottom-0 h-1 bg-[#f85606]" />
-          <div className="flex items-center gap-3">
-            <span className="grid h-9 w-9 place-items-center rounded-md bg-[#f85606]">
-              <Store size={19} strokeWidth={2.2} />
-            </span>
-            <span className="text-base font-semibold">SellerDesk</span>
-          </div>
+          <Brand dark />
 
           <div className="max-w-md">
-            <p className="mb-5 text-xs font-semibold uppercase text-[#f7a379]">Daraz operations</p>
+            <p className="mb-5 text-xs font-semibold uppercase text-[#f7a379]">Daraz intelligence</p>
             <h1 className="text-[42px] font-semibold leading-[1.15] text-white">
               Your seller account, clearly in view.
             </h1>
             <p className="mt-5 max-w-sm text-[15px] leading-7 text-[#b8c1c9]">
-              Connect your store securely and keep the numbers that matter close at hand.
+              Connect your Daraz store securely and turn seller data into decisions.
             </p>
           </div>
 
@@ -193,10 +196,7 @@ function AuthPanel({ onAuthenticated }) {
         <section className="flex items-center justify-center px-5 py-9 sm:px-10 lg:px-16">
           <div className="w-full max-w-[400px]">
             <div className="mb-10 flex items-center gap-3 lg:hidden">
-              <span className="grid h-9 w-9 place-items-center rounded-md bg-[#f85606] text-white">
-                <Store size={19} />
-              </span>
-              <span className="font-semibold text-[#18232c]">SellerDesk</span>
+              <Brand />
             </div>
 
             {(mode === 'verify' || mode === 'otp') && (
@@ -263,7 +263,7 @@ function AuthPanel({ onAuthenticated }) {
 
             {(mode === 'login' || mode === 'register') && (
               <p className="mt-7 text-center text-sm text-[#707b86]">
-                {mode === 'login' ? 'New to SellerDesk?' : 'Already have an account?'}{' '}
+                {mode === 'login' ? 'New to daraziq.store?' : 'Already have an account?'}{' '}
                 <button type="button" onClick={() => changeMode(mode === 'login' ? 'register' : 'login')} className="font-semibold text-[#2e3943] hover:text-[#f85606]">
                   {mode === 'login' ? 'Create account' : 'Sign in'}
                 </button>
