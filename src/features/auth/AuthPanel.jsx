@@ -12,6 +12,7 @@ import {
   User,
 } from 'lucide-react'
 import { authApi } from '../../shared/api'
+import './AuthPanel.css'
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
 
@@ -62,24 +63,24 @@ function GoogleButton({ onCredential }) {
 const Input = ({ icon: Icon, label, ...props }) => (
   <label className="block">
     <span className="mb-2 block text-sm font-medium text-[#303640]">{label}</span>
-    <span className="flex h-11 items-center gap-3 rounded-md border border-[#d9dde3] bg-white px-3 transition focus-within:border-[#f85606] focus-within:ring-1 focus-within:ring-[#fdd8c6]">
-      <Icon size={17} className="shrink-0 text-[#788390]" />
-      <input className="min-w-0 flex-1 bg-transparent text-sm text-[#151a21] outline-none placeholder:text-[#9ca4ae]" {...props} />
+    <span className="flex h-11 items-center gap-3 rounded-md border border-[#d8dde3] bg-white px-3 transition focus-within:border-[#9aa4b2] focus-within:ring-2 focus-within:ring-[#edf0f3]">
+      <Icon size={17} className="shrink-0 text-[#7b8491]" />
+      <input className="min-w-0 flex-1 bg-transparent text-sm text-[#15181d] outline-none placeholder:text-[#98a2b3]" {...props} />
     </span>
   </label>
 )
 
 const Brand = ({ dark = false }) => (
   <div className="flex min-w-0 items-center gap-3">
-    <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-md border border-white/15 bg-white shadow-sm">
+    <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-lg border border-[#e5e7eb] bg-white">
       <img src="/favicon.svg" alt="" className="h-full w-full object-cover object-center" />
     </span>
-    <span className={`text-base font-semibold ${dark ? 'text-white' : 'text-[#18232c]'}`}>daraziq.store</span>
+    <span className={`text-base font-semibold ${dark ? 'text-[#15181d]' : 'text-[#15181d]'}`}>daraziq.store</span>
   </div>
 )
 
-function AuthPanel({ onAuthenticated }) {
-  const [mode, setMode] = useState('login')
+function AuthPanel({ initialMode = 'login', onBackHome, onAuthenticated }) {
+  const [mode, setMode] = useState(initialMode)
   const [form, setForm] = useState({ name: '', email: '', password: '', otp: '' })
   const [otpSent, setOtpSent] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -164,31 +165,30 @@ function AuthPanel({ onAuthenticated }) {
   }[mode]
 
   return (
-    <main className="min-h-screen bg-[#f4f6f8] p-3 sm:p-5">
-      <div className="mx-auto grid min-h-[calc(100vh-24px)] max-w-6xl overflow-hidden rounded-lg border border-[#dfe3e8] bg-white shadow-[0_18px_50px_rgba(27,35,45,0.08)] sm:min-h-[calc(100vh-40px)] lg:grid-cols-[1.05fr_0.95fr]">
-        <section className="relative hidden flex-col justify-between overflow-hidden bg-[#18232c] p-10 text-white lg:flex">
-          <div className="absolute inset-x-0 bottom-0 h-1 bg-[#f85606]" />
+    <main className="auth-page min-h-screen bg-[#f7f8fa] p-4 sm:p-6">
+      <div className="mx-auto grid min-h-[calc(100vh-32px)] max-w-5xl overflow-hidden rounded-xl border border-[#e5e7eb] bg-white sm:min-h-[calc(100vh-48px)] lg:grid-cols-[0.9fr_1fr]">
+        <section className="hidden flex-col justify-between overflow-hidden border-r border-[#eef0f2] bg-[#fafbfc] p-10 text-[#15181d] lg:flex">
           <Brand dark />
 
           <div className="max-w-md">
-            <p className="mb-5 text-xs font-semibold uppercase text-[#f7a379]">Daraz intelligence</p>
-            <h1 className="text-[42px] font-semibold leading-[1.15] text-white">
+            <p className="mb-5 text-xs font-medium uppercase text-[#8a94a3]">Daraz intelligence</p>
+            <h1 className="text-[38px] font-semibold leading-[1.15] text-[#15181d]">
               Your seller account, clearly in view.
             </h1>
-            <p className="mt-5 max-w-sm text-[15px] leading-7 text-[#b8c1c9]">
+            <p className="mt-5 max-w-sm text-[15px] leading-7 text-[#667085]">
               Connect your Daraz store securely and turn seller data into decisions.
             </p>
           </div>
 
-          <div className="grid grid-cols-3 border-y border-white/10 py-5">
-            <div className="flex items-center gap-2.5 text-sm text-[#d9dfe4]">
-              <ShieldCheck size={17} className="text-[#65c3a5]" /> Secure OAuth
+          <div className="grid grid-cols-3 border-y border-[#e5e7eb] py-5">
+            <div className="flex items-center gap-2.5 text-sm text-[#4b5563]">
+              <ShieldCheck size={17} className="text-[#26735b]" /> Secure OAuth
             </div>
-            <div className="flex items-center gap-2.5 text-sm text-[#d9dfe4]">
-              <BarChart3 size={17} className="text-[#65c3a5]" /> Live stats
+            <div className="flex items-center gap-2.5 text-sm text-[#4b5563]">
+              <BarChart3 size={17} className="text-[#26735b]" /> Live stats
             </div>
-            <div className="flex items-center gap-2.5 text-sm text-[#d9dfe4]">
-              <Check size={17} className="text-[#65c3a5]" /> Easy control
+            <div className="flex items-center gap-2.5 text-sm text-[#4b5563]">
+              <Check size={17} className="text-[#26735b]" /> Easy control
             </div>
           </div>
         </section>
@@ -199,14 +199,20 @@ function AuthPanel({ onAuthenticated }) {
               <Brand />
             </div>
 
+            {onBackHome && mode !== 'verify' && (
+              <button type="button" onClick={onBackHome} className="mb-6 flex items-center gap-2 text-sm font-medium text-[#687480] hover:text-[#20262d]">
+                <ArrowLeft size={16} /> Back to home
+              </button>
+            )}
+
             {(mode === 'verify' || mode === 'otp') && (
               <button type="button" onClick={() => changeMode('login')} className="mb-6 flex items-center gap-2 text-sm font-medium text-[#687480] hover:text-[#20262d]">
                 <ArrowLeft size={16} /> Back to sign in
               </button>
             )}
 
-            <h2 className="text-2xl font-semibold text-[#171c22]">{title}</h2>
-            <p className="mt-2 text-sm leading-6 text-[#707b86]">
+            <h2 className="text-2xl font-semibold text-[#15181d]">{title}</h2>
+            <p className="mt-2 text-sm leading-6 text-[#667085]">
               {mode === 'register' && 'Start with your business email.'}
               {mode === 'login' && 'Sign in to manage your connected store.'}
               {mode === 'verify' && `Enter the code sent to ${form.email || 'your email'}.`}
@@ -226,10 +232,10 @@ function AuthPanel({ onAuthenticated }) {
                 <div>
                   <label className="block">
                     <span className="mb-2 block text-sm font-medium text-[#303640]">Password</span>
-                    <span className="flex h-11 items-center gap-3 rounded-md border border-[#d9dde3] bg-white px-3 transition focus-within:border-[#f85606] focus-within:ring-1 focus-within:ring-[#fdd8c6]">
-                      <LockKeyhole size={17} className="shrink-0 text-[#788390]" />
-                      <input type={showPassword ? 'text' : 'password'} value={form.password} onChange={update('password')} placeholder={mode === 'register' ? 'At least 8 characters' : 'Your password'} autoComplete={mode === 'register' ? 'new-password' : 'current-password'} minLength={8} required className="min-w-0 flex-1 bg-transparent text-sm text-[#151a21] outline-none placeholder:text-[#9ca4ae]" />
-                      <button type="button" onClick={() => setShowPassword((value) => !value)} className="text-[#788390] hover:text-[#303640]" aria-label={showPassword ? 'Hide password' : 'Show password'}>
+                    <span className="flex h-11 items-center gap-3 rounded-md border border-[#d8dde3] bg-white px-3 transition focus-within:border-[#9aa4b2] focus-within:ring-2 focus-within:ring-[#edf0f3]">
+                      <LockKeyhole size={17} className="shrink-0 text-[#7b8491]" />
+                      <input type={showPassword ? 'text' : 'password'} value={form.password} onChange={update('password')} placeholder={mode === 'register' ? 'At least 8 characters' : 'Your password'} autoComplete={mode === 'register' ? 'new-password' : 'current-password'} minLength={8} required className="min-w-0 flex-1 bg-transparent text-sm text-[#15181d] outline-none placeholder:text-[#98a2b3]" />
+                      <button type="button" onClick={() => setShowPassword((value) => !value)} className="text-[#7b8491] hover:text-[#303640]" aria-label={showPassword ? 'Hide password' : 'Show password'}>
                         {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                       </button>
                     </span>
@@ -241,10 +247,10 @@ function AuthPanel({ onAuthenticated }) {
                 <Input icon={KeyRound} label="6-digit code" value={form.otp} onChange={update('otp')} inputMode="numeric" pattern="[0-9]{6}" maxLength={6} placeholder="000000" autoComplete="one-time-code" required />
               )}
 
-              {error && <div role="alert" className="rounded-md border border-[#f1c8bd] bg-[#fff5f2] px-3 py-2.5 text-sm text-[#9a341f]">{error}</div>}
-              {notice && <div className="rounded-md border border-[#bde1d5] bg-[#f0faf6] px-3 py-2.5 text-sm text-[#236b55]">{notice}</div>}
+              {error && <div role="alert" className="rounded-lg border border-[#f2c6bc] bg-[#fff8f6] px-3 py-2.5 text-sm text-[#9a341f]">{error}</div>}
+              {notice && <div className="rounded-lg border border-[#bde1d5] bg-[#f4fbf8] px-3 py-2.5 text-sm text-[#236b55]">{notice}</div>}
 
-              <button disabled={loading} className="flex h-11 w-full items-center justify-center rounded-md bg-[#f85606] px-4 text-sm font-semibold text-white transition hover:bg-[#dd4c04] disabled:cursor-not-allowed disabled:opacity-60">
+              <button disabled={loading} className="flex h-11 w-full items-center justify-center rounded-md bg-[#20252c] px-4 text-sm font-semibold text-white transition hover:bg-[#111827] disabled:cursor-not-allowed disabled:opacity-60">
                 {loading ? 'Please wait...' : mode === 'register' ? 'Create account' : mode === 'verify' ? 'Verify and continue' : mode === 'otp' ? (otpSent ? 'Verify and sign in' : 'Send sign-in code') : 'Sign in'}
               </button>
             </form>

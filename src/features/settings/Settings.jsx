@@ -34,7 +34,7 @@ const Field = ({ label, ...props }) => (
   <label className="block min-w-0">
     <span className="mb-2 block text-xs font-semibold uppercase text-[#858e97]">{label}</span>
     <input
-      className="h-10 w-full rounded-md border border-[#d9dde3] bg-white px-3 text-sm text-[#171c22] transition placeholder:text-[#a0a7ae] focus:border-[#f85606] focus:outline-none focus:ring-2 focus:ring-[#fdd8c6]"
+      className="h-10 w-full rounded-md border border-[#d8dde3] bg-white px-3 text-sm text-[#15181d] transition placeholder:text-[#98a2b3] focus:border-[#9aa4b2] focus:outline-none focus:ring-2 focus:ring-[#edf0f3]"
       {...props}
     />
   </label>
@@ -63,8 +63,8 @@ const ProviderButton = ({ provider, active, onClick }) => {
   return (
     <button
       onClick={onClick}
-      className={`min-w-0 cursor-pointer rounded-md border p-4 text-left shadow-[0_8px_18px_rgba(21,26,33,0.03)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(21,26,33,0.07)] ${
-        active ? provider.accent : 'border-[#dfe3e8] bg-white text-[#46525d] hover:border-[#cfd6dd] hover:bg-[#f8f9fa]'
+      className={`min-w-0 cursor-pointer rounded-lg border p-4 text-left transition ${
+        active ? provider.accent : 'border-[#e5e7eb] bg-white text-[#46525d] hover:border-[#d8dde3] hover:bg-[#fafbfc]'
       }`}
     >
       <div className="flex items-start justify-between gap-4">
@@ -91,11 +91,11 @@ const ProviderPanel = ({
   onKey,
   onClear,
 }) => (
-  <section className="overflow-hidden border border-[#dfe3e8] bg-white shadow-[0_10px_28px_rgba(21,26,33,0.04)]">
-    <div className="flex flex-col justify-between gap-3 border-b border-[#e2e5e9] px-5 py-4 sm:flex-row sm:items-center">
+  <section className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white">
+    <div className="flex flex-col justify-between gap-3 border-b border-[#eef0f2] px-5 py-4 sm:flex-row sm:items-center">
       <div className="min-w-0">
-        <h2 className="text-base font-semibold">{title}</h2>
-        <p className="mt-1 truncate text-xs text-[#7c8690]">{description}</p>
+        <h2 className="text-base font-semibold text-[#15181d]">{title}</h2>
+        <p className="mt-1 truncate text-xs text-[#667085]">{description}</p>
       </div>
       <StatusPill {...status} />
     </div>
@@ -104,20 +104,20 @@ const ProviderPanel = ({
       <div>
         <Field label="API key" type="password" value={apiKey} onChange={onKey} placeholder={keyPlaceholder} autoComplete="off" />
         {(status?.hasUserKey || status?.hasPlatformKey) && !apiKey && (
-          <p className="mt-2 text-xs font-medium text-[#66717c]">
+          <p className="mt-2 text-xs font-medium text-[#667085]">
             Saved key: <span className="font-mono">************</span> {status?.hasUserKey ? '(user key)' : '(platform key)'}
           </p>
         )}
       </div>
     </div>
-    <div className="flex flex-col justify-between gap-3 border-t border-[#e2e5e9] px-5 py-4 sm:flex-row sm:items-center">
-      <div className="flex items-center gap-2 text-xs text-[#7c8690]">
+    <div className="flex flex-col justify-between gap-3 border-t border-[#eef0f2] px-5 py-4 sm:flex-row sm:items-center">
+      <div className="flex items-center gap-2 text-xs text-[#667085]">
         <LockKeyhole size={14} /> Keys are encrypted at rest.
       </div>
       <button
         onClick={onClear}
-        className={`inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md border px-3 text-sm font-medium transition hover:-translate-y-0.5 ${
-          clear ? 'border-[#efc9c1] bg-[#fff6f3] text-[#a33a22]' : 'border-[#d5dae0] text-[#3f4953] hover:bg-[#f8f9fa]'
+        className={`inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md border px-3 text-sm font-medium transition ${
+          clear ? 'border-[#f2c6bc] bg-[#fff8f6] text-[#a33a22]' : 'border-[#d8dde3] text-[#344054] hover:bg-[#f8fafc]'
         }`}
       >
         <Trash2 size={15} /> {clear ? 'Will clear' : 'Clear saved key'}
@@ -205,39 +205,39 @@ function Settings({ user }) {
   if (loading) {
     return (
       <div className="grid min-h-[420px] place-items-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d9dde3] border-t-[#f85606]" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d8dde3] border-t-[#20252c]" />
       </div>
     )
   }
 
   return (
     <div>
-      <div className="flex flex-col justify-between gap-4 border-b border-[#dfe3e8] pb-6 sm:flex-row sm:items-end">
+      <div className="flex flex-col justify-between gap-4 border-b border-[#e5e7eb] pb-5 sm:flex-row sm:items-end">
         <div>
-          <p className="text-xs font-semibold uppercase text-[#8a939c]">Settings</p>
-          <h1 className="mt-2 text-2xl font-semibold text-[#171c22]">AI provider</h1>
-          <p className="mt-1.5 text-sm text-[#727d87]">Provider routing for {user.name}.</p>
+          <p className="text-xs font-medium uppercase text-[#8a94a3]">Settings</p>
+          <h1 className="mt-2 text-2xl font-semibold text-[#15181d]">AI provider</h1>
+          <p className="mt-1.5 text-sm text-[#667085]">Choose the model route used by Copilot briefs for {user.name}.</p>
         </div>
         <button
           onClick={save}
           disabled={saving}
-          className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md bg-[#f85606] px-4 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#dd4c04] disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60"
+          className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md bg-[#20252c] px-4 text-sm font-semibold text-white transition hover:bg-[#111827] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />} Save settings
         </button>
       </div>
 
       {(notice || error) && (
-        <div className={`mt-5 flex items-start gap-3 rounded-md border px-4 py-3 text-sm ${error ? 'border-[#efc9c1] bg-[#fff6f3] text-[#983720]' : 'border-[#b9dfd2] bg-[#f1faf7] text-[#236b55]'}`}>
+        <div className={`mt-5 flex items-start gap-3 rounded-lg border px-4 py-3 text-sm ${error ? 'border-[#f2c6bc] bg-[#fff8f6] text-[#983720]' : 'border-[#b9dfd2] bg-[#f4fbf8] text-[#236b55]'}`}>
           {error ? <CircleAlert size={17} className="mt-0.5 shrink-0" /> : <CheckCircle2 size={17} className="mt-0.5 shrink-0" />}
           <span className="flex-1">{error || notice}</span>
         </div>
       )}
 
-      <section className="mt-7 overflow-hidden border border-[#dfe3e8] bg-white shadow-[0_10px_28px_rgba(21,26,33,0.04)]">
-        <div className="border-b border-[#e2e5e9] px-5 py-4">
-          <h2 className="text-base font-semibold">Active provider</h2>
-          <p className="mt-1 text-xs text-[#7c8690]">{activeProvider.label}</p>
+      <section className="mt-6 overflow-hidden rounded-lg border border-[#e5e7eb] bg-white">
+        <div className="border-b border-[#eef0f2] px-5 py-4">
+          <h2 className="text-base font-semibold text-[#15181d]">Active provider</h2>
+          <p className="mt-1 text-xs text-[#667085]">{activeProvider.label}</p>
         </div>
         <div className="grid gap-3 px-5 py-5 md:grid-cols-2">
           {providers.map((provider) => (
@@ -251,7 +251,7 @@ function Settings({ user }) {
         </div>
       </section>
 
-      <div className="mt-7 grid gap-7 xl:grid-cols-2">
+      <div className="mt-6 grid gap-6 xl:grid-cols-2">
         <ProviderPanel
           title="OpenRouter"
           description="Default route for low-cost AI briefs"
@@ -281,27 +281,27 @@ function Settings({ user }) {
         />
       </div>
 
-      <section className="mt-7 grid overflow-hidden border border-[#dfe3e8] bg-[#e5e8eb] shadow-[0_10px_28px_rgba(21,26,33,0.04)] sm:grid-cols-3">
+      <section className="mt-6 grid overflow-hidden rounded-lg border border-[#e5e7eb] bg-[#eef0f2] sm:grid-cols-3">
         <div className="bg-white px-5 py-5">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase text-[#8a939c]">
+          <div className="flex items-center gap-2 text-xs font-medium uppercase text-[#8a94a3]">
             <Sparkles size={14} /> Active
           </div>
-          <p className="mt-2 truncate text-xl font-semibold text-[#171c22]">{activeProvider.label}</p>
-          <p className="mt-1 truncate text-xs text-[#7c8690]">Used by Copilot AI brief</p>
+          <p className="mt-2 truncate text-xl font-semibold text-[#15181d]">{activeProvider.label}</p>
+          <p className="mt-1 truncate text-xs text-[#667085]">Used by Copilot AI brief</p>
         </div>
         <div className="bg-white px-5 py-5">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase text-[#8a939c]">
+          <div className="flex items-center gap-2 text-xs font-medium uppercase text-[#8a94a3]">
             <KeyRound size={14} /> OpenRouter
           </div>
-          <p className="mt-2 truncate text-xl font-semibold text-[#171c22]">{settings?.providers.openrouter.ready ? 'Ready' : 'Needs key'}</p>
-          <p className="mt-1 truncate text-xs text-[#7c8690]">{settings?.providers.openrouter.model}</p>
+          <p className="mt-2 truncate text-xl font-semibold text-[#15181d]">{settings?.providers.openrouter.ready ? 'Ready' : 'Needs key'}</p>
+          <p className="mt-1 truncate text-xs text-[#667085]">{settings?.providers.openrouter.model}</p>
         </div>
         <div className="bg-white px-5 py-5">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase text-[#8a939c]">
+          <div className="flex items-center gap-2 text-xs font-medium uppercase text-[#8a94a3]">
             <Bot size={14} /> OpenAI GPT
           </div>
-          <p className="mt-2 truncate text-xl font-semibold text-[#171c22]">{settings?.providers.openai.ready ? 'Ready' : 'Needs key'}</p>
-          <p className="mt-1 truncate text-xs text-[#7c8690]">{settings?.providers.openai.model}</p>
+          <p className="mt-2 truncate text-xl font-semibold text-[#15181d]">{settings?.providers.openai.ready ? 'Ready' : 'Needs key'}</p>
+          <p className="mt-1 truncate text-xs text-[#667085]">{settings?.providers.openai.model}</p>
         </div>
       </section>
     </div>

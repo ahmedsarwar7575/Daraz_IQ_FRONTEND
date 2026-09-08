@@ -32,30 +32,30 @@ const featureStyles = {
   store: {
     bg: 'bg-[#edf8f4]',
     text: 'text-[#236b55]',
-    border: 'border-[#b9dfd2]',
-    soft: 'bg-[#f6fbf9]',
-    button: 'bg-[#27745d] hover:bg-[#1f604d]',
+    border: 'border-[#d4ece3]',
+    soft: 'bg-white',
+    button: 'bg-[#20252c] hover:bg-[#111827]',
   },
   product: {
     bg: 'bg-[#eef6fb]',
     text: 'text-[#2e6f9e]',
-    border: 'border-[#c6ddea]',
-    soft: 'bg-[#f6fbfe]',
-    button: 'bg-[#2f6f9f] hover:bg-[#285f88]',
+    border: 'border-[#d5e6f0]',
+    soft: 'bg-white',
+    button: 'bg-[#20252c] hover:bg-[#111827]',
   },
   pricing: {
     bg: 'bg-[#fff1ea]',
     text: 'text-[#a33a22]',
-    border: 'border-[#efc9c1]',
-    soft: 'bg-[#fff8f4]',
-    button: 'bg-[#d94c06] hover:bg-[#bd4205]',
+    border: 'border-[#f3d4cb]',
+    soft: 'bg-white',
+    button: 'bg-[#20252c] hover:bg-[#111827]',
   },
   mcp: {
     bg: 'bg-[#f1f3f5]',
     text: 'text-[#3f4953]',
-    border: 'border-[#d6dce2]',
-    soft: 'bg-[#f8f9fa]',
-    button: 'bg-[#313a43] hover:bg-[#222a31]',
+    border: 'border-[#e1e5e9]',
+    soft: 'bg-white',
+    button: 'bg-[#20252c] hover:bg-[#111827]',
   },
 }
 
@@ -144,7 +144,7 @@ const formatNumber = (value) => {
 const shortId = (value) => value ? `${String(value).slice(0, 8)}...` : 'Session user'
 
 const EmptyPanel = ({ children }) => (
-  <div className="grid min-h-[150px] place-items-center rounded-md border border-dashed border-[#d8dde3] bg-[#fbfcfd] px-5 text-center text-sm text-[#7c8690]">
+  <div className="grid min-h-[140px] place-items-center rounded-lg border border-dashed border-[#d8dde3] bg-[#fafbfc] px-5 text-center text-sm text-[#667085]">
     {children}
   </div>
 )
@@ -153,7 +153,7 @@ const MiniBars = ({ items = [], valueKey = 'orders', color = '#27745d' }) => {
   const max = Math.max(1, ...items.map((item) => Number(item[valueKey]) || 0))
   if (!items.some((item) => Number(item[valueKey]) > 0)) return <EmptyPanel>No chart data available for this period.</EmptyPanel>
   return (
-    <div className="flex h-48 items-end gap-1.5 rounded-md border border-[#e1e5e9] bg-[#fbfcfd] px-3 py-3">
+    <div className="flex h-44 items-end gap-1.5 rounded-lg border border-[#e5e7eb] bg-[#fafbfc] px-3 py-3">
       {items.map((item) => {
         const value = Number(item[valueKey]) || 0
         return (
@@ -177,7 +177,7 @@ const DistributionBars = ({ products = [] }) => {
   const max = Math.max(1, ...prices)
   if (!prices.length) return <EmptyPanel>No competitor prices loaded yet.</EmptyPanel>
   return (
-    <div className="flex h-44 items-end gap-2 rounded-md border border-[#e1e5e9] bg-[#fbfcfd] px-4 py-4">
+    <div className="flex h-40 items-end gap-2 rounded-lg border border-[#e5e7eb] bg-[#fafbfc] px-4 py-4">
       {prices.map((price, index) => (
         <div key={`${price}-${index}`} className="flex min-w-0 flex-1 flex-col items-center gap-2">
           <div className="flex h-32 w-full items-end">
@@ -195,7 +195,7 @@ const DistributionBars = ({ products = [] }) => {
 
 const FormattedBrief = ({ text }) => {
   const clean = String(text || '').replace(/\*\*/g, '').replace(/\\\*/g, '*').trim()
-  if (!clean) return <p className="text-sm leading-6 text-[#7c8690]">No brief generated yet.</p>
+  if (!clean) return <p className="text-sm leading-6 text-[#667085]">No brief generated yet.</p>
   const lines = clean.split('\n').map((line) => line.trim()).filter(Boolean)
   return (
     <div className="space-y-3">
@@ -203,7 +203,7 @@ const FormattedBrief = ({ text }) => {
         const heading = /^(executive summary|what changed|recommended actions|risk checks|pricing rationale)$/i.test(line.replace(':', ''))
         const bullet = /^[-*]\s+/.test(line) || /^\d+\.\s+/.test(line)
         if (heading) {
-          return <h3 key={`${line}-${index}`} className="pt-1 text-sm font-semibold uppercase text-[#171c22]">{line.replace(':', '')}</h3>
+          return <h3 key={`${line}-${index}`} className="pt-1 text-sm font-semibold uppercase text-[#15181d]">{line.replace(':', '')}</h3>
         }
         return (
           <p key={`${line}-${index}`} className={cx('text-sm leading-6 text-[#3f4953]', bullet && 'pl-3')}>
@@ -218,7 +218,7 @@ const FormattedBrief = ({ text }) => {
 const CompetitorTable = ({ products = [], empty = 'No competitor products loaded yet.' }) => (
   <div className="overflow-x-auto">
     <table className="w-full min-w-[820px] text-left text-sm">
-      <thead className="border-b border-[#e2e5e9] bg-[#f8f9fa] text-xs font-semibold uppercase text-[#858e97]">
+      <thead className="border-b border-[#e5e7eb] bg-[#fafbfc] text-xs font-medium uppercase text-[#8a94a3]">
         <tr>
           <th className="px-5 py-3">Listing</th>
           <th className="px-5 py-3">Price</th>
@@ -230,15 +230,15 @@ const CompetitorTable = ({ products = [], empty = 'No competitor products loaded
       </thead>
       <tbody className="divide-y divide-[#eef0f2]">
         {products.slice(0, 12).map((product) => (
-          <tr key={product.itemId || product.productUrl || product.title} className="bg-white transition hover:bg-[#f8fbfd]">
+          <tr key={product.itemId || product.productUrl || product.title} className="bg-white transition hover:bg-[#fafbfc]">
             <td className="px-5 py-3">
               <div className="flex items-center gap-3">
                 {product.imageUrl
                   ? <img src={product.imageUrl} alt="" className="h-11 w-11 rounded-md object-cover" />
                   : <span className="h-11 w-11 rounded-md bg-[#edf1f4]" />}
                 <div className="min-w-0">
-                  <p className="max-w-[430px] truncate font-medium text-[#2e3943]">{product.title}</p>
-                  <p className="mt-1 text-xs text-[#8a939c]">Rank {product.rank || '-'}</p>
+                  <p className="max-w-[430px] truncate font-medium text-[#242b33]">{product.title}</p>
+                  <p className="mt-1 text-xs text-[#8a94a3]">Rank {product.rank || '-'}</p>
                 </div>
               </div>
             </td>
@@ -248,7 +248,7 @@ const CompetitorTable = ({ products = [], empty = 'No competitor products loaded
             <td className="px-5 py-3 text-[#53606c]">{product.location || '-'}</td>
             <td className="px-5 py-3">
               {product.productUrl ? (
-                <a href={product.productUrl} target="_blank" rel="noreferrer" className="inline-flex h-8 items-center gap-1.5 rounded-md border border-[#d5dae0] px-2.5 text-xs font-semibold text-[#3f4953] transition hover:-translate-y-0.5 hover:bg-[#f8f9fa]">
+                <a href={product.productUrl} target="_blank" rel="noreferrer" className="inline-flex h-8 items-center gap-1.5 rounded-md border border-[#d8dde3] px-2.5 text-xs font-semibold text-[#344054] transition hover:bg-[#f8fafc]">
                   Open <ExternalLink size={13} />
                 </a>
               ) : '-'}
@@ -257,7 +257,7 @@ const CompetitorTable = ({ products = [], empty = 'No competitor products loaded
         ))}
         {!products.length && (
           <tr>
-            <td className="px-5 py-10 text-center text-sm text-[#7c8690]" colSpan={6}>{empty}</td>
+            <td className="px-5 py-10 text-center text-sm text-[#667085]" colSpan={6}>{empty}</td>
           </tr>
         )}
       </tbody>
@@ -268,13 +268,13 @@ const CompetitorTable = ({ products = [], empty = 'No competitor products loaded
 const Button = ({ icon: Icon, children, loading, tone = 'store', variant = 'primary', ...props }) => {
   const style = featureStyles[tone] || featureStyles.store
   const className = variant === 'secondary'
-    ? 'border border-[#d5dae0] bg-white text-[#3f4953] hover:bg-[#f7f8f9]'
+    ? 'border border-[#d8dde3] bg-white text-[#344054] hover:bg-[#f8fafc]'
     : `${style.button} text-white`
 
   return (
     <button
       className={cx(
-        'inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md px-3.5 text-sm font-semibold shadow-sm transition duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60',
+        'inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md px-3.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60',
         className,
       )}
       disabled={loading || props.disabled}
@@ -290,7 +290,7 @@ const Field = ({ label, ...props }) => (
   <label className="block min-w-0">
     <span className="mb-2 block text-xs font-semibold uppercase text-[#858e97]">{label}</span>
     <input
-      className="h-10 w-full rounded-md border border-[#d9dde3] bg-white px-3 text-sm text-[#171c22] transition hover:border-[#c4cbd2] focus:border-[#f85606] focus:outline-none focus:ring-2 focus:ring-[#fdd8c6]"
+      className="h-10 w-full rounded-md border border-[#d8dde3] bg-white px-3 text-sm text-[#15181d] transition placeholder:text-[#98a2b3] hover:border-[#c4cbd2] focus:border-[#9aa4b2] focus:outline-none focus:ring-2 focus:ring-[#edf0f3]"
       {...props}
     />
   </label>
@@ -300,7 +300,7 @@ const Select = ({ label, children, ...props }) => (
   <label className="block min-w-0">
     <span className="mb-2 block text-xs font-semibold uppercase text-[#858e97]">{label}</span>
     <select
-      className="h-10 w-full cursor-pointer rounded-md border border-[#d9dde3] bg-white px-3 text-sm text-[#171c22] transition hover:border-[#c4cbd2] focus:border-[#f85606] focus:outline-none focus:ring-2 focus:ring-[#fdd8c6]"
+      className="h-10 w-full cursor-pointer rounded-md border border-[#d8dde3] bg-white px-3 text-sm text-[#15181d] transition hover:border-[#c4cbd2] focus:border-[#9aa4b2] focus:outline-none focus:ring-2 focus:ring-[#edf0f3]"
       {...props}
     >
       {children}
@@ -309,8 +309,8 @@ const Select = ({ label, children, ...props }) => (
 )
 
 const Toggle = ({ label, checked, onChange }) => (
-  <label className="flex h-10 cursor-pointer items-center justify-between gap-3 rounded-md border border-[#d9dde3] bg-white px-3 transition hover:border-[#c4cbd2] hover:bg-[#fbfcfd]">
-    <span className="truncate text-sm font-medium text-[#3f4953]">{label}</span>
+  <label className="flex h-10 cursor-pointer items-center justify-between gap-3 rounded-md border border-[#d8dde3] bg-white px-3 transition hover:border-[#c4cbd2] hover:bg-[#fafbfc]">
+    <span className="truncate text-sm font-medium text-[#344054]">{label}</span>
     <input
       type="checkbox"
       checked={checked}
@@ -323,14 +323,14 @@ const Toggle = ({ label, checked, onChange }) => (
 const MetricTile = ({ icon: Icon, label, value, detail, tone = 'store' }) => {
   const style = featureStyles[tone] || featureStyles.store
   return (
-    <div className="min-w-0 border border-[#e1e5e9] bg-white p-4 shadow-[0_8px_22px_rgba(21,26,33,0.035)] transition duration-200 hover:-translate-y-0.5 hover:border-[#cfd6dd] hover:shadow-[0_16px_32px_rgba(21,26,33,0.07)]">
+    <div className="min-w-0 border border-[#e5e7eb] bg-white p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="truncate text-xs font-semibold uppercase text-[#8a939c]">{label}</p>
-          <p className="mt-2 truncate text-xl font-semibold text-[#171c22]">{value ?? '-'}</p>
-          <p className="mt-1 truncate text-xs text-[#7c8690]">{detail}</p>
+          <p className="truncate text-xs font-medium uppercase text-[#8a94a3]">{label}</p>
+          <p className="mt-2 truncate text-xl font-semibold text-[#15181d]">{value ?? '-'}</p>
+          <p className="mt-1 truncate text-xs text-[#667085]">{detail}</p>
         </div>
-        <span className={cx('grid h-9 w-9 shrink-0 place-items-center rounded-md', style.bg, style.text)}>
+        <span className={cx('grid h-9 w-9 shrink-0 place-items-center rounded-lg', style.bg, style.text)}>
           <Icon size={17} />
         </span>
       </div>
@@ -344,22 +344,22 @@ const Severity = ({ value }) => {
     : value === 'medium'
       ? 'bg-[#fff8e6] text-[#7a5200]'
       : 'bg-[#edf8f4] text-[#236b55]'
-  return <span className={cx('rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase', tone)}>{value || 'low'}</span>
+  return <span className={cx('rounded-full px-2.5 py-1 text-[11px] font-medium uppercase', tone)}>{value || 'low'}</span>
 }
 
 const InsightList = ({ items = [], empty = 'No findings yet.' }) => (
-  <div className="divide-y divide-[#e5e8eb] border border-[#e1e5e9] bg-white">
+  <div className="divide-y divide-[#eef0f2] rounded-lg border border-[#e5e7eb] bg-white">
     {items.length ? items.map((item, index) => (
-      <div key={`${item.title || item.message}-${index}`} className="p-4 transition hover:bg-[#fbfcfd]">
+      <div key={`${item.title || item.message}-${index}`} className="p-4 transition hover:bg-[#fafbfc]">
         <div className="flex flex-wrap items-center gap-2">
           <Severity value={item.severity || 'low'} />
-          <h4 className="text-sm font-semibold text-[#171c22]">{item.title || item.message}</h4>
+          <h4 className="text-sm font-semibold text-[#15181d]">{item.title || item.message}</h4>
         </div>
-        {item.metric && <p className="mt-2 text-xs font-medium text-[#66717c]">{item.metric}</p>}
-        <p className="mt-1 text-sm leading-6 text-[#505b65]">{item.action || item.message}</p>
+        {item.metric && <p className="mt-2 text-xs font-medium text-[#667085]">{item.metric}</p>}
+        <p className="mt-1 text-sm leading-6 text-[#4b5563]">{item.action || item.message}</p>
       </div>
     )) : (
-      <div className="p-6 text-center text-sm text-[#7c8690]">{empty}</div>
+      <div className="p-6 text-center text-sm text-[#667085]">{empty}</div>
     )}
   </div>
 )
@@ -371,10 +371,10 @@ const FeatureTab = ({ feature, active, onClick }) => {
     <button
       onClick={onClick}
       className={cx(
-        'flex min-h-14 min-w-0 cursor-pointer items-center gap-3 rounded-md border px-3 text-left text-sm font-semibold transition duration-200 hover:-translate-y-0.5',
+        'flex min-h-12 min-w-0 cursor-pointer items-center gap-3 rounded-md border px-3 text-left text-sm font-semibold transition',
         active
           ? `${style.border} ${style.bg} ${style.text}`
-          : 'border-[#e0e4e8] bg-white text-[#66717c] hover:border-[#cfd6dd] hover:bg-[#f8f9fa]',
+          : 'border-[#e5e7eb] bg-white text-[#667085] hover:border-[#d8dde3] hover:bg-[#fafbfc]',
       )}
     >
       <Icon size={17} />
@@ -391,8 +391,8 @@ const Notice = ({ error, notice, connected }) => {
   const danger = Boolean(error || !connected)
   return (
     <div className={cx(
-      'mt-5 flex items-start gap-3 rounded-md border px-4 py-3 text-sm',
-      danger ? 'border-[#efc9c1] bg-[#fff6f3] text-[#983720]' : 'border-[#b9dfd2] bg-[#f1faf7] text-[#236b55]',
+      'mt-5 flex items-start gap-3 rounded-lg border px-4 py-3 text-sm',
+      danger ? 'border-[#f2c6bc] bg-[#fff8f6] text-[#983720]' : 'border-[#b9dfd2] bg-[#f4fbf8] text-[#236b55]',
     )}>
       {danger ? <CircleAlert size={17} className="mt-0.5 shrink-0" /> : <CheckCircle2 size={17} className="mt-0.5 shrink-0" />}
       <span className="flex-1">{error || notice || 'Connect Daraz to unlock live store metrics. Competitor benchmarking can still use cached market data.'}</span>
@@ -401,11 +401,11 @@ const Notice = ({ error, notice, connected }) => {
 }
 
 const AiBrief = ({ result, loading, onGenerate, tone, disabled }) => (
-  <section className="overflow-hidden border border-[#dfe3e8] bg-white shadow-[0_10px_28px_rgba(21,26,33,0.04)]">
-    <div className="flex flex-col justify-between gap-3 border-b border-[#e2e5e9] px-5 py-4 sm:flex-row sm:items-center">
+  <section className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white">
+    <div className="flex flex-col justify-between gap-3 border-b border-[#eef0f2] px-5 py-4 sm:flex-row sm:items-center">
       <div className="min-w-0">
-        <h2 className="text-base font-semibold text-[#171c22]">AI brief</h2>
-        <p className="mt-1 truncate text-xs text-[#7c8690]">
+        <h2 className="text-base font-semibold text-[#15181d]">AI brief</h2>
+        <p className="mt-1 truncate text-xs text-[#667085]">
           {result ? `${result.providerLabel || 'Local'} · ${result.model || 'fallback'}` : 'Provider from Settings'}
         </p>
       </div>
@@ -415,7 +415,7 @@ const AiBrief = ({ result, loading, onGenerate, tone, disabled }) => (
     </div>
     <div className="min-h-[180px] px-5 py-5">
       {result?.warning && (
-        <div className="mb-4 rounded-md border border-[#efc9c1] bg-[#fff6f3] px-3 py-2 text-xs text-[#983720]">
+        <div className="mb-4 rounded-md border border-[#f2c6bc] bg-[#fff8f6] px-3 py-2 text-xs text-[#983720]">
           {result.warning}
         </div>
       )}
@@ -640,29 +640,27 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
 
   return (
     <div>
-      <div className="overflow-hidden border border-[#dfe3e8] bg-white shadow-[0_10px_28px_rgba(21,26,33,0.04)]">
-        <div className={cx('flex flex-col justify-between gap-5 px-5 py-5 sm:px-6 lg:flex-row lg:items-center', featureStyles[activeFeature]?.soft)}>
-          <div className="flex min-w-0 items-start gap-4">
-            <span className={cx('grid h-11 w-11 shrink-0 place-items-center rounded-md', featureStyles[activeFeature]?.bg, featureStyles[activeFeature]?.text)}>
-              <ActiveIcon size={21} />
-            </span>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase text-[#8a939c]">{activeMeta.eyebrow}</p>
-              <h1 className="mt-1 text-2xl font-semibold text-[#171c22]">{activeMeta.label}</h1>
-              <p className="mt-1.5 max-w-2xl text-sm leading-6 text-[#687480]">{activeMeta.description}</p>
-            </div>
+      <div className="flex flex-col justify-between gap-4 border-b border-[#e5e7eb] pb-5 lg:flex-row lg:items-end">
+        <div className="flex min-w-0 items-start gap-3">
+          <span className={cx('grid h-10 w-10 shrink-0 place-items-center rounded-lg', featureStyles[activeFeature]?.bg, featureStyles[activeFeature]?.text)}>
+            <ActiveIcon size={20} />
+          </span>
+          <div className="min-w-0">
+            <p className="text-xs font-medium uppercase text-[#8a94a3]">{activeMeta.eyebrow}</p>
+            <h1 className="mt-1 text-2xl font-semibold text-[#15181d]">{activeMeta.label}</h1>
+            <p className="mt-1.5 max-w-2xl text-sm leading-6 text-[#667085]">{activeMeta.description}</p>
           </div>
-          {activeFeature === 'mcp' && (
-            <div className="flex flex-wrap gap-2">
-              <span className="inline-flex h-9 items-center gap-2 rounded-md border border-[#d6dce2] bg-white px-3 text-xs font-semibold text-[#3f4953] shadow-sm">
-                <Bot size={15} /> {primitiveCounts.tools} tools
-              </span>
-              <span className="inline-flex h-9 items-center gap-2 rounded-md border border-[#d6dce2] bg-white px-3 text-xs font-semibold text-[#3f4953] shadow-sm">
-                <Server size={15} /> OAuth MCP
-              </span>
-            </div>
-          )}
         </div>
+        {activeFeature === 'mcp' && (
+          <div className="flex flex-wrap gap-2">
+            <span className="inline-flex h-9 items-center gap-2 rounded-md border border-[#d8dde3] bg-white px-3 text-xs font-semibold text-[#344054]">
+              <Bot size={15} /> {primitiveCounts.tools} tools
+            </span>
+            <span className="inline-flex h-9 items-center gap-2 rounded-md border border-[#d8dde3] bg-white px-3 text-xs font-semibold text-[#344054]">
+              <Server size={15} /> OAuth MCP
+            </span>
+          </div>
+        )}
       </div>
 
       <Notice error={error} notice={notice} connected={connected} />
@@ -682,11 +680,11 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
 
       {activeFeature === 'store' && (
         <div className="mt-7 grid gap-7 xl:grid-cols-[1fr_390px]">
-          <section className="overflow-hidden border border-[#dfe3e8] bg-white shadow-[0_10px_28px_rgba(21,26,33,0.04)]">
-            <div className="flex flex-col justify-between gap-4 border-b border-[#e2e5e9] px-5 py-4 sm:flex-row sm:items-center">
+          <section className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white">
+            <div className="flex flex-col justify-between gap-4 border-b border-[#eef0f2] px-5 py-4 sm:flex-row sm:items-center">
               <div>
                 <h2 className="text-base font-semibold">Store review</h2>
-                <p className="mt-1 text-xs text-[#7c8690]">Live metrics, date range, source sync, anomaly signals</p>
+                <p className="mt-1 text-xs text-[#667085]">Live metrics, date range, source sync, anomaly signals</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button icon={BarChart3} tone="store" loading={working === 'store'} onClick={reviewStore}>
@@ -697,7 +695,7 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
                 </Button>
               </div>
             </div>
-            <div className="grid gap-4 border-b border-[#e2e5e9] px-5 py-5 sm:grid-cols-3">
+            <div className="grid gap-4 border-b border-[#eef0f2] px-5 py-5 sm:grid-cols-3">
               <Select label="Range" value={dateRange.days} onChange={updateRange('days')}>
                 <option value={7}>Last 7 days</option>
                 <option value={30}>Last 30 days</option>
@@ -717,7 +715,7 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
                 <div className="mb-5 flex flex-col gap-3 rounded-md border border-[#efc9c1] bg-[#fff6f3] px-4 py-3 text-sm text-[#983720] sm:flex-row sm:items-center sm:justify-between">
                   <span>Daraz authorization needs to be refreshed before live metrics are reliable.</span>
                   {storeReview.reconnectUrl && (
-                    <a href={storeReview.reconnectUrl} className="inline-flex h-9 cursor-pointer items-center justify-center rounded-md bg-[#d94c06] px-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#bd4205]">
+                    <a href={storeReview.reconnectUrl} className="inline-flex h-9 cursor-pointer items-center justify-center rounded-md bg-[#d94c06] px-3 text-sm font-semibold text-white transition hover:bg-[#bd4205]">
                       Reconnect Daraz
                     </a>
                   )}
@@ -725,24 +723,24 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
               )}
               <InsightList items={storeReview?.recommendations || []} empty="Run a store review to load findings." />
             </div>
-            <div className="grid gap-5 border-t border-[#e2e5e9] px-5 py-5 xl:grid-cols-2">
+            <div className="grid gap-5 border-t border-[#eef0f2] px-5 py-5 xl:grid-cols-2">
               <div>
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <h3 className="text-sm font-semibold text-[#171c22]">Daily orders</h3>
+                  <h3 className="text-sm font-semibold text-[#15181d]">Daily orders</h3>
                   <LineChart size={17} className="text-[#27745d]" />
                 </div>
                 <MiniBars items={storeReview?.charts?.dailyOrders || []} color="#27745d" />
               </div>
               <div>
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <h3 className="text-sm font-semibold text-[#171c22]">Order statuses</h3>
+                  <h3 className="text-sm font-semibold text-[#15181d]">Order statuses</h3>
                   <PieChart size={17} className="text-[#27745d]" />
                 </div>
-                <div className="space-y-2 rounded-md border border-[#e1e5e9] bg-[#fbfcfd] p-4">
+                <div className="space-y-2 rounded-md border border-[#e1e5e9] bg-[#fafbfc] p-4">
                   {(storeReview?.charts?.statusBreakdown || []).length ? (storeReview.charts.statusBreakdown.map((item) => (
                     <div key={item.status} className="flex items-center justify-between gap-3 text-sm">
                       <span className="capitalize text-[#53606c]">{item.status}</span>
-                      <span className="font-semibold text-[#171c22]">{formatNumber(item.count)}</span>
+                      <span className="font-semibold text-[#15181d]">{formatNumber(item.count)}</span>
                     </div>
                   ))) : <EmptyPanel>No status data available for this range.</EmptyPanel>}
                 </div>
@@ -761,11 +759,11 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
 
       {activeFeature === 'product' && (
         <div className="mt-7 space-y-7">
-          <section className="overflow-hidden border border-[#dfe3e8] bg-white shadow-[0_10px_28px_rgba(21,26,33,0.04)]">
-            <div className="flex flex-col justify-between gap-4 border-b border-[#e2e5e9] px-5 py-4 lg:flex-row lg:items-center">
+          <section className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white">
+            <div className="flex flex-col justify-between gap-4 border-b border-[#eef0f2] px-5 py-4 lg:flex-row lg:items-center">
               <div>
                 <h2 className="text-base font-semibold">Product Lab</h2>
-                <p className="mt-1 text-xs text-[#7c8690]">Competitor search, listing diff, product recommendations</p>
+                <p className="mt-1 text-xs text-[#667085]">Competitor search, listing diff, product recommendations</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button variant="secondary" tone="product" icon={Search} loading={working === 'market'} onClick={() => searchMarket(false)}>
@@ -783,11 +781,11 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
               </div>
             </div>
 
-            <div className="border-b border-[#e2e5e9] px-5 py-5">
+            <div className="border-b border-[#eef0f2] px-5 py-5">
               <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
                 <div>
-                  <h3 className="text-sm font-semibold text-[#171c22]">Your products</h3>
-                  <p className="mt-1 text-xs text-[#7c8690]">
+                  <h3 className="text-sm font-semibold text-[#15181d]">Your products</h3>
+                  <p className="mt-1 text-xs text-[#667085]">
                     {loadingProducts ? 'Loading Daraz catalog...' : `${filteredProducts.length} of ${products.length} products shown`}
                   </p>
                 </div>
@@ -796,7 +794,7 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
                     value={productSearch}
                     onChange={(event) => setProductSearch(event.target.value)}
                     placeholder="Search by product name or SKU"
-                    className="h-10 w-full rounded-md border border-[#d9dde3] bg-white px-3 text-sm text-[#171c22] transition placeholder:text-[#9ca4ae] focus:border-[#f85606] focus:outline-none focus:ring-2 focus:ring-[#fdd8c6] sm:w-72"
+                    className="h-10 w-full rounded-md border border-[#d8dde3] bg-white px-3 text-sm text-[#15181d] transition placeholder:text-[#98a2b3] focus:border-[#9aa4b2] focus:outline-none focus:ring-2 focus:ring-[#edf0f3] sm:w-72"
                   />
                   {loadingProducts
                     ? <Loader2 size={18} className="animate-spin text-[#2e6f9e]" />
@@ -814,45 +812,45 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
                     key={product.id || product.sku}
                     onClick={() => selectProduct(product)}
                     className={cx(
-                      'min-w-0 cursor-pointer rounded-md border p-4 text-left shadow-[0_8px_18px_rgba(21,26,33,0.03)] transition duration-200 hover:-translate-y-0.5 hover:bg-[#f8fbfd] hover:shadow-[0_14px_28px_rgba(21,26,33,0.07)]',
+                      'min-w-0 cursor-pointer rounded-md border p-4 text-left transition hover:bg-[#fafbfc]',
                       marketForm.sku === product.sku
                         ? 'border-[#c6ddea] bg-[#eef6fb]'
-                        : 'border-[#dfe3e8] bg-white',
+                        : 'border-[#e5e7eb] bg-white',
                     )}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-[#171c22]">{product.title}</p>
-                        <p className="mt-1 truncate text-xs text-[#7c8690]">{product.sku}</p>
+                        <p className="truncate text-sm font-semibold text-[#15181d]">{product.title}</p>
+                        <p className="mt-1 truncate text-xs text-[#667085]">{product.sku}</p>
                       </div>
                       <span className="shrink-0 text-sm font-semibold text-[#2e6f9e]">{formatCurrency(product.price)}</span>
                     </div>
                     <div className="mt-3 grid grid-cols-3 gap-px bg-[#dfe6ec] text-xs">
-                      <span className="bg-white px-2 py-1.5 text-[#66717c]">Stock {product.stock ?? '-'}</span>
-                      <span className="bg-white px-2 py-1.5 text-[#66717c]">Rate {product.rating ?? '-'}</span>
-                      <span className="bg-white px-2 py-1.5 text-[#66717c]">Reviews {product.reviewCount ?? '-'}</span>
+                      <span className="bg-white px-2 py-1.5 text-[#667085]">Stock {product.stock ?? '-'}</span>
+                      <span className="bg-white px-2 py-1.5 text-[#667085]">Rate {product.rating ?? '-'}</span>
+                      <span className="bg-white px-2 py-1.5 text-[#667085]">Reviews {product.reviewCount ?? '-'}</span>
                     </div>
                   </button>
                 ))}
                 {loadingProducts && (
-                  <div className="rounded-md border border-[#dfe3e8] bg-white p-4 text-sm text-[#7c8690]">
+                  <div className="rounded-md border border-[#e5e7eb] bg-white p-4 text-sm text-[#667085]">
                     Loading product snapshots.
                   </div>
                 )}
                 {!loadingProducts && !products.length && (
-                  <div className="rounded-md border border-[#dfe3e8] bg-white p-4 text-sm text-[#7c8690]">
+                  <div className="rounded-md border border-[#e5e7eb] bg-white p-4 text-sm text-[#667085]">
                     No product snapshots yet.
                   </div>
                 )}
                 {!loadingProducts && products.length > 0 && !filteredProducts.length && (
-                  <div className="rounded-md border border-[#dfe3e8] bg-white p-4 text-sm text-[#7c8690]">
+                  <div className="rounded-md border border-[#e5e7eb] bg-white p-4 text-sm text-[#667085]">
                     No product matches that search.
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="grid gap-4 border-b border-[#e2e5e9] px-5 py-5 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="grid gap-4 border-b border-[#eef0f2] px-5 py-5 sm:grid-cols-2 lg:grid-cols-5">
               <Field label="Market query" value={marketForm.query} onChange={updateMarket('query')} />
               <Field label="SKU / item ID" value={marketForm.sku} onChange={updateMarket('sku')} placeholder="Optional" />
               <Field label="Current price" value={marketForm.currentPrice} onChange={updateMarket('currentPrice')} inputMode="decimal" />
@@ -869,10 +867,10 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
           </section>
 
           <div className="grid gap-7 xl:grid-cols-[1fr_390px]">
-            <section className="overflow-hidden border border-[#dfe3e8] bg-white shadow-[0_10px_28px_rgba(21,26,33,0.04)]">
-              <div className="border-b border-[#e2e5e9] px-5 py-4">
+            <section className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white">
+              <div className="border-b border-[#eef0f2] px-5 py-4">
                 <h2 className="text-base font-semibold">Product verdict</h2>
-                <p className="mt-1 text-xs text-[#7c8690]">{productAnalysis?.ownProduct?.source || 'Waiting for analysis'}</p>
+                <p className="mt-1 text-xs text-[#667085]">{productAnalysis?.ownProduct?.source || 'Waiting for analysis'}</p>
               </div>
               <div className="grid gap-px bg-[#e5e8eb] sm:grid-cols-3">
                 <MetricTile tone="product" icon={Tags} label="Own price" value={formatCurrency(productAnalysis?.computed?.ownPrice)} detail="Current price" />
@@ -892,11 +890,11 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
             />
           </div>
 
-          <section className="overflow-hidden border border-[#dfe3e8] bg-white shadow-[0_10px_28px_rgba(21,26,33,0.04)]">
-            <div className="flex flex-col justify-between gap-4 border-b border-[#e2e5e9] px-5 py-4 sm:flex-row sm:items-center">
+          <section className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white">
+            <div className="flex flex-col justify-between gap-4 border-b border-[#eef0f2] px-5 py-4 sm:flex-row sm:items-center">
               <div>
                 <h2 className="text-base font-semibold">Competitor products</h2>
-                <p className="mt-1 text-xs text-[#7c8690]">Scraped Daraz market listings with prices and source links</p>
+                <p className="mt-1 text-xs text-[#667085]">Scraped Daraz market listings with prices and source links</p>
               </div>
               {competitors?.warning && <span className="rounded-md bg-[#fff6f3] px-3 py-2 text-xs font-medium text-[#983720]">{competitors.warning}</span>}
             </div>
@@ -907,11 +905,11 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
 
       {activeFeature === 'pricing' && (
         <div className="mt-7 space-y-7">
-          <section className="overflow-hidden border border-[#dfe3e8] bg-white shadow-[0_10px_28px_rgba(21,26,33,0.04)]">
-            <div className="flex flex-col justify-between gap-4 border-b border-[#e2e5e9] px-5 py-4 lg:flex-row lg:items-center">
+          <section className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white">
+            <div className="flex flex-col justify-between gap-4 border-b border-[#eef0f2] px-5 py-4 lg:flex-row lg:items-center">
               <div>
                 <h2 className="text-base font-semibold">Pricing Control</h2>
-                <p className="mt-1 text-xs text-[#7c8690]">Guardrails, price recommendation, audit log</p>
+                <p className="mt-1 text-xs text-[#667085]">Guardrails, price recommendation, audit log</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button tone="pricing" icon={Gauge} loading={working === 'price'} onClick={analyzePrice}>
@@ -926,7 +924,7 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
               </div>
             </div>
 
-            <div className="grid gap-4 border-b border-[#e2e5e9] px-5 py-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 border-b border-[#eef0f2] px-5 py-5 sm:grid-cols-2 lg:grid-cols-4">
               <Field label="SKU" value={marketForm.sku} onChange={updateMarket('sku')} />
               <Field label="Query" value={marketForm.query} onChange={updateMarket('query')} />
               <Field label="Current price" value={marketForm.currentPrice} onChange={updateMarket('currentPrice')} inputMode="decimal" />
@@ -939,20 +937,20 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
               <MetricTile tone="pricing" icon={Percent} label="Position" value={priceAnalysis?.pricePercentile ?? '-'} detail="Competitor percentile" />
               <MetricTile tone="pricing" icon={ShieldCheck} label="Audit" value={repriceResult?.log?.status || '-'} detail={repriceResult?.message || 'No price logged'} />
             </div>
-            <div className="grid gap-5 border-t border-[#e2e5e9] px-5 py-5 xl:grid-cols-[0.85fr_1.15fr]">
+            <div className="grid gap-5 border-t border-[#eef0f2] px-5 py-5 xl:grid-cols-[0.85fr_1.15fr]">
               <div>
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <h3 className="text-sm font-semibold text-[#171c22]">Competitor price spread</h3>
+                  <h3 className="text-sm font-semibold text-[#15181d]">Competitor price spread</h3>
                   <PieChart size={17} className="text-[#d94c06]" />
                 </div>
                 <DistributionBars products={priceAnalysis?.competitors?.products || []} />
               </div>
               <div>
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <h3 className="text-sm font-semibold text-[#171c22]">Pricing rationale</h3>
+                  <h3 className="text-sm font-semibold text-[#15181d]">Pricing rationale</h3>
                   <LineChart size={17} className="text-[#d94c06]" />
                 </div>
-                <div className="space-y-2 rounded-md border border-[#e1e5e9] bg-[#fbfcfd] p-4">
+                <div className="space-y-2 rounded-md border border-[#e1e5e9] bg-[#fafbfc] p-4">
                   {(priceAnalysis?.rationale || []).length ? priceAnalysis.rationale.map((item) => (
                     <p key={item} className="text-sm leading-6 text-[#4d5863]">{item}</p>
                   )) : <EmptyPanel>Run price analysis to calculate guardrails and market rationale.</EmptyPanel>}
@@ -962,11 +960,11 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
           </section>
 
           <div className="grid gap-7 xl:grid-cols-[1fr_390px]">
-            <section className="overflow-hidden border border-[#dfe3e8] bg-white shadow-[0_10px_28px_rgba(21,26,33,0.04)]">
-              <div className="flex flex-col justify-between gap-4 border-b border-[#e2e5e9] px-5 py-4 sm:flex-row sm:items-center">
+            <section className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white">
+              <div className="flex flex-col justify-between gap-4 border-b border-[#eef0f2] px-5 py-4 sm:flex-row sm:items-center">
                 <div>
                   <h2 className="text-base font-semibold">Guardrails</h2>
-                  <p className="mt-1 text-xs text-[#7c8690]">Server-side controls for every reprice request</p>
+                  <p className="mt-1 text-xs text-[#667085]">Server-side controls for every reprice request</p>
                 </div>
                 <Button variant="secondary" tone="pricing" icon={Save} loading={working === 'guardrails'} onClick={saveGuardrails}>
                   Save
@@ -995,10 +993,10 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
             />
           </div>
 
-          <section className="overflow-hidden border border-[#dfe3e8] bg-white shadow-[0_10px_28px_rgba(21,26,33,0.04)]">
-            <div className="border-b border-[#e2e5e9] px-5 py-4">
+          <section className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white">
+            <div className="border-b border-[#eef0f2] px-5 py-4">
               <h2 className="text-base font-semibold">Competitor products</h2>
-              <p className="mt-1 text-xs text-[#7c8690]">Listings used for the pricing recommendation</p>
+              <p className="mt-1 text-xs text-[#667085]">Listings used for the pricing recommendation</p>
             </div>
             <CompetitorTable products={priceAnalysis?.competitors?.products || []} empty="Run price analysis to load competitor products." />
           </section>
@@ -1007,11 +1005,11 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
 
       {activeFeature === 'mcp' && (
         <div className="mt-7 grid gap-7 xl:grid-cols-[1fr_390px]">
-          <section className="overflow-hidden border border-[#dfe3e8] bg-white shadow-[0_10px_28px_rgba(21,26,33,0.04)]">
-            <div className="flex flex-col justify-between gap-4 border-b border-[#e2e5e9] px-5 py-4 sm:flex-row sm:items-center">
+          <section className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white">
+            <div className="flex flex-col justify-between gap-4 border-b border-[#eef0f2] px-5 py-4 sm:flex-row sm:items-center">
               <div>
                 <h2 className="text-base font-semibold">MCP Access</h2>
-                <p className="mt-1 text-xs text-[#7c8690]">External client transport for the same seller tools</p>
+                <p className="mt-1 text-xs text-[#667085]">External client transport for the same seller tools</p>
               </div>
               <Button tone="mcp" icon={Copy} loading={working === 'copyEndpoint'} onClick={copyMcpEndpoint}>
                 Copy endpoint
@@ -1029,7 +1027,7 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
                 <div className="flex items-center gap-2 text-sm font-semibold text-[#3f4953]">
                   <Server size={16} /> Endpoint
                 </div>
-                <code className="min-w-0 overflow-x-auto rounded-md border border-[#d9dde3] bg-[#f8f9fa] px-3 py-2 text-xs text-[#313a43]">
+                <code className="min-w-0 overflow-x-auto rounded-md border border-[#d8dde3] bg-[#f8f9fa] px-3 py-2 text-xs text-[#313a43]">
                   {mcpEndpoint}
                 </code>
               </div>
@@ -1045,33 +1043,33 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
             </div>
           </section>
 
-          <section className="overflow-hidden border border-[#dfe3e8] bg-white shadow-[0_10px_28px_rgba(21,26,33,0.04)]">
-            <div className="border-b border-[#e2e5e9] px-5 py-4">
+          <section className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white">
+            <div className="border-b border-[#eef0f2] px-5 py-4">
               <h2 className="text-base font-semibold">MCP surface</h2>
-              <p className="mt-1 text-xs text-[#7c8690]">Available to Claude, GPT, or another MCP client</p>
+              <p className="mt-1 text-xs text-[#667085]">Available to Claude, GPT, or another MCP client</p>
             </div>
             <div className="divide-y divide-[#e5e8eb]">
               <div className="px-5 py-4">
-                <p className="text-xs font-semibold uppercase text-[#8a939c]">Tools</p>
+                <p className="text-xs font-semibold uppercase text-[#8a94a3]">Tools</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {(manifest?.tools || []).map((item) => (
-                    <span key={item} className="rounded-md border border-[#dfe3e8] bg-[#f8f9fa] px-2.5 py-1.5 text-xs font-medium text-[#3f4953]">{item}</span>
+                    <span key={item} className="rounded-md border border-[#e5e7eb] bg-[#f8f9fa] px-2.5 py-1.5 text-xs font-medium text-[#3f4953]">{item}</span>
                   ))}
                 </div>
               </div>
               <div className="px-5 py-4">
-                <p className="text-xs font-semibold uppercase text-[#8a939c]">Resources</p>
+                <p className="text-xs font-semibold uppercase text-[#8a94a3]">Resources</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {(manifest?.resources || []).map((item) => (
-                    <span key={item} className="rounded-md border border-[#dfe3e8] bg-[#f8f9fa] px-2.5 py-1.5 text-xs font-medium text-[#3f4953]">{item}</span>
+                    <span key={item} className="rounded-md border border-[#e5e7eb] bg-[#f8f9fa] px-2.5 py-1.5 text-xs font-medium text-[#3f4953]">{item}</span>
                   ))}
                 </div>
               </div>
               <div className="px-5 py-4">
-                <p className="text-xs font-semibold uppercase text-[#8a939c]">Prompts</p>
+                <p className="text-xs font-semibold uppercase text-[#8a94a3]">Prompts</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {(manifest?.prompts || []).map((item) => (
-                    <span key={item} className="rounded-md border border-[#dfe3e8] bg-[#f8f9fa] px-2.5 py-1.5 text-xs font-medium text-[#3f4953]">{item}</span>
+                    <span key={item} className="rounded-md border border-[#e5e7eb] bg-[#f8f9fa] px-2.5 py-1.5 text-xs font-medium text-[#3f4953]">{item}</span>
                   ))}
                 </div>
               </div>

@@ -1,143 +1,74 @@
-# daraziq.store Frontend
+# daraziq.store Web Experience
 
-Professional React dashboard for daraziq.store, a Daraz seller intelligence SaaS that helps marketplace sellers connect their Daraz account, inspect store performance, benchmark products, use AI-assisted workflows, and expose the same business tools through an MCP connector.
+daraziq.store is a SaaS workspace for Daraz sellers who want clearer store performance, stronger product decisions, safer pricing control, and AI-ready marketplace workflows.
 
-This frontend is built as a portfolio-grade SaaS interface with a clean, minimal visual system, feature-separated workspace navigation, and a seller-focused dashboard experience.
+This web experience is the customer-facing product: the public website, authentication journey, seller dashboard, product research workspace, pricing control center, settings area, and MCP access page.
 
-## Product Overview
+## Product Positioning
 
-daraziq.store gives Daraz sellers one workspace for:
+daraziq.store helps sellers move from scattered marketplace signals to one operating view. Sellers can connect their Daraz account, understand current store health, compare products against market listings, review AI-supported recommendations, and expose the same account-scoped tools to compatible MCP clients.
 
-- Connecting and disconnecting their Daraz seller account.
-- Viewing store status, seller identity, and high-level operational stats.
-- Reviewing store performance through a dedicated Store Analyst page.
-- Searching competitor products and benchmarking listings in Product Lab.
-- Running guarded pricing analysis in Pricing Control.
-- Configuring AI provider settings for OpenAI or OpenRouter.
-- Copying and testing the MCP endpoint for external AI clients such as Claude.
+## Key Experiences
 
-The frontend consumes a single Node/Express backend API. The backend owns authentication, Daraz OAuth, encrypted token storage, seller data, AI calls, browser automation, and MCP transport.
+- Public SaaS website with product, services, about, contact, privacy, and terms pages.
+- Secure sign-up and sign-in flow for seller workspaces.
+- Seller overview showing account status, order activity, catalog health, and sync context.
+- Store Analyst for performance reviews, trends, source status, and operational recommendations.
+- Product Lab for product snapshots, competitor search, listing quality signals, and product verdicts.
+- Pricing Control for price analysis, margin guardrails, recommendations, and audit logs.
+- MCP Access page for connecting external AI clients to protected seller tools.
+- Settings area for AI provider preferences.
 
-## Tech Stack
+## Privacy Standard
 
-- React 19
-- Vite
-- Tailwind CSS 4
-- Lucide React icons
-- REST API integration
-- JWT session storage
-- Google Identity Services support
+The frontend must never publish personal information in product copy, documentation, screenshots, placeholder content, or example data. Do not include real emails, private customer names, seller credentials, API keys, order identifiers, access tokens, or live business records in public-facing materials.
 
-## Application Structure
+Demo content should always be synthetic, clearly product-safe, and realistic enough to show the value of the workspace without exposing a real seller or customer.
 
-```txt
-frontend/
-  src/
-    features/
-      auth/          # Login, signup, OTP, Google auth UI
-      dashboard/     # SaaS shell, navigation, overview
-      copilot/       # Store Analyst, Product Lab, Pricing Control, MCP Access
-      settings/      # AI provider configuration
-    shared/
-      api.js         # API client and token persistence
-    App.jsx
-    main.jsx
-    index.css
-```
+## Brand Tone
 
-The structure is feature-oriented but intentionally compact. Shared logic is kept small, while each business area has a clear owner file for easier portfolio review.
+daraziq.store should feel like a focused SaaS product for marketplace operators:
 
-## Main Screens
+- Professional, calm, and metrics-led.
+- Clear about what data powers each workflow.
+- Confident about security and account-scoped access.
+- Practical about AI recommendations and pricing controls.
+- Built for daily seller decisions, not generic marketing noise.
 
-- **Overview**: Seller connection status, Daraz account metadata, dashboard KPIs, disconnect action.
-- **Store Analyst**: Store metrics, historical snapshots, AI-generated business review, reconnect handling.
-- **Product Lab**: Seller product list, competitor search, product health analysis, product cards.
-- **Pricing Control**: Price recommendation workflow, guardrails, reprice audit history.
-- **MCP Access**: Remote MCP endpoint, available tools, resources, and prompt surface.
-- **Settings**: AI provider switch between OpenAI and OpenRouter with model/key configuration.
+## Customer Value
 
-## Environment Variables
+Sellers use daraziq.store to answer questions such as:
 
-Create a frontend `.env` file:
+- How is my store performing right now?
+- Which products need attention first?
+- Where does my price sit against competitors?
+- What action is safe under my margin rules?
+- Which AI or MCP client can use my seller tools with proper authorization?
 
-```env
-VITE_API_URL=https://daraz-mcp-backend.onrender.com/api
-VITE_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
-```
+## Public Pages
 
-For local development:
+The web experience includes public pages for:
 
-```env
-VITE_API_URL=http://localhost:4000/api
-VITE_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
-```
+- Home
+- Services
+- About
+- Contact
+- Privacy Policy
+- Terms and Conditions
 
-## Local Development
+These pages should explain the product as a SaaS seller intelligence platform and avoid developer-focused setup instructions.
 
-Install dependencies:
+## Product Modules
 
-```bash
-npm install
-```
+| Module | Purpose |
+| --- | --- |
+| Seller Overview | Gives sellers a fast read on account status, recent activity, product count, and source health. |
+| Store Analyst | Turns store metrics and historical snapshots into prioritized actions. |
+| Product Lab | Compares seller products with competitor listings and market signals. |
+| Pricing Control | Recommends guarded price moves and records the decision trail. |
+| MCP Access | Lets authorized AI clients call the same seller tools. |
+| Settings | Keeps AI provider and workspace preferences manageable. |
 
-Run the development server:
+## Demo Data Rule
 
-```bash
-npm run dev
-```
-
-Open:
-
-```txt
-http://localhost:5173
-```
-
-Run linting:
-
-```bash
-npm run lint
-```
-
-Create a production build:
-
-```bash
-npm run build
-```
-
-Preview the production build:
-
-```bash
-npm run preview
-```
-
-## Backend Contract
-
-The frontend expects the backend to expose:
-
-- `/api/auth/*` for email/password, OTP, Google sign-in, and session validation.
-- `/api/daraz/*` for Daraz OAuth connection and seller account status.
-- `/api/copilot/*` for seller analytics, competitor search, AI workflows, and pricing tools.
-- `/api/settings/ai` for provider/model/API key configuration.
-- `/api/mcp` as the MCP endpoint displayed to users.
-
-## Portfolio Highlights
-
-This frontend demonstrates:
-
-- Building a real SaaS dashboard instead of a static landing page.
-- Feature-based React organization.
-- Authenticated API consumption with persisted session state.
-- Marketplace OAuth connection UX.
-- Multi-provider AI settings UX.
-- MCP endpoint discovery and user-facing integration guidance.
-- Responsive, minimal, professional UI styling with Tailwind.
-
-## Deployment Notes
-
-The frontend can be deployed to Vercel, Netlify, Render Static Sites, or any static hosting provider.
-
-Production requirements:
-
-- Set `VITE_API_URL` to the deployed backend `/api` URL.
-- Set `VITE_GOOGLE_CLIENT_ID` if Google login is enabled.
-- Ensure the backend CORS configuration allows the deployed frontend domain.
+Any showcase account, demo view, pitch material, or screenshot must use synthetic business data. Demo data may look realistic, but it must not represent real customer records, real private seller performance, or real credentials.
