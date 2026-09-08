@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Activity,
-  ArrowRight,
   BarChart3,
   Bot,
   CheckCircle2,
@@ -115,6 +114,294 @@ const defaultManifest = {
   prompts: ['weekly_store_review', 'product_health_check', 'reprice_workflow'],
 }
 
+const sampleDailyOrders = [
+  18, 22, 19, 24, 21, 28, 33, 25, 29, 31,
+  27, 36, 34, 38, 41, 37, 44, 39, 42, 47,
+  43, 50, 46, 54, 58, 53, 61, 57, 65, 68,
+].map((orders, index) => {
+  const date = new Date('2026-09-08T00:00:00.000Z')
+  date.setDate(date.getDate() - (29 - index))
+  return { date: date.toISOString().slice(0, 10), orders }
+})
+
+const sampleImages = {
+  earbuds: 'https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?auto=format&fit=crop&w=420&q=80',
+  watch: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=420&q=80',
+  headset: 'https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&fit=crop&w=420&q=80',
+  shoes: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=420&q=80',
+  backpack: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=420&q=80',
+  camera: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=420&q=80',
+  skincare: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=420&q=80',
+  laptop: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=420&q=80',
+}
+
+const sampleProducts = [
+  {
+    itemId: 'DRZ-1847201',
+    sku: 'AUR-EB-X7-BLK',
+    title: 'AuroraSound X7 Wireless Earbuds with ANC and 42H Case',
+    query: 'wireless earbuds',
+    price: 5290,
+    cost: 3475,
+    stock: 184,
+    rating: 4.7,
+    reviewCount: 1284,
+    imageCount: 7,
+    imageUrl: sampleImages.earbuds,
+    source: 'Sample catalog',
+  },
+  {
+    itemId: 'DRZ-1847202',
+    sku: 'NOVA-FIT-S2-GRY',
+    title: 'NovaFit S2 Bluetooth Calling Smart Watch',
+    query: 'smartwatch',
+    price: 6990,
+    cost: 4550,
+    stock: 96,
+    rating: 4.6,
+    reviewCount: 842,
+    imageCount: 8,
+    imageUrl: sampleImages.watch,
+    source: 'Sample catalog',
+  },
+  {
+    itemId: 'DRZ-1847203',
+    sku: 'SONIC-HS-G9',
+    title: 'SonicWave G9 Gaming Headset with Noise Cancel Mic',
+    query: 'gaming headset',
+    price: 4190,
+    cost: 2680,
+    stock: 142,
+    rating: 4.5,
+    reviewCount: 613,
+    imageCount: 6,
+    imageUrl: sampleImages.headset,
+    source: 'Sample catalog',
+  },
+  {
+    itemId: 'DRZ-1847204',
+    sku: 'STRIDE-RN-41',
+    title: 'StrideFlex Lightweight Running Shoes for Men',
+    query: 'running shoes',
+    price: 3590,
+    cost: 2210,
+    stock: 211,
+    rating: 4.4,
+    reviewCount: 932,
+    imageCount: 9,
+    imageUrl: sampleImages.shoes,
+    source: 'Sample catalog',
+  },
+  {
+    itemId: 'DRZ-1847205',
+    sku: 'URBAN-BP-18L',
+    title: 'UrbanCarry 18L Water Resistant Laptop Backpack',
+    query: 'laptop backpack',
+    price: 2990,
+    cost: 1815,
+    stock: 258,
+    rating: 4.6,
+    reviewCount: 1087,
+    imageCount: 7,
+    imageUrl: sampleImages.backpack,
+    source: 'Sample catalog',
+  },
+  {
+    itemId: 'DRZ-1847206',
+    sku: 'PIXEL-MINI-CAM',
+    title: 'PixelMini 1080p Vlogging Camera Kit',
+    query: 'vlogging camera',
+    price: 12990,
+    cost: 9050,
+    stock: 47,
+    rating: 4.3,
+    reviewCount: 274,
+    imageCount: 8,
+    imageUrl: sampleImages.camera,
+    source: 'Sample catalog',
+  },
+  {
+    itemId: 'DRZ-1847207',
+    sku: 'GLOW-SERUM-C',
+    title: 'GlowNest Vitamin C Serum 30ml',
+    query: 'vitamin c serum',
+    price: 1690,
+    cost: 930,
+    stock: 319,
+    rating: 4.8,
+    reviewCount: 1516,
+    imageCount: 6,
+    imageUrl: sampleImages.skincare,
+    source: 'Sample catalog',
+  },
+  {
+    itemId: 'DRZ-1847208',
+    sku: 'PRODOCK-USBC-7',
+    title: 'ProDock 7-in-1 USB-C Hub for Laptop',
+    query: 'usb c hub',
+    price: 4490,
+    cost: 2860,
+    stock: 118,
+    rating: 4.5,
+    reviewCount: 689,
+    imageCount: 6,
+    imageUrl: sampleImages.laptop,
+    source: 'Sample catalog',
+  },
+]
+
+const sampleCompetitorProducts = [
+  { rank: 1, itemId: 'MKT-WIRELESS-EARBUDS-01', title: 'Prime Wireless Earbuds 1', productUrl: 'https://www.daraz.pk/catalog/?q=wireless+earbuds', imageUrl: sampleImages.earbuds, price: 3810, currency: 'PKR', discountPercent: 8, soldCount: 259, reviewCount: 74, rating: 4.1, location: 'Karachi', imageCount: 5 },
+  { rank: 2, itemId: 'MKT-WIRELESS-EARBUDS-02', title: 'Metro Wireless Earbuds 2', productUrl: 'https://www.daraz.pk/catalog/?q=wireless+earbuds', imageUrl: sampleImages.earbuds, price: 4290, currency: 'PKR', discountPercent: 12, soldCount: 285, reviewCount: 103, rating: 4.2, location: 'Lahore', imageCount: 6 },
+  { rank: 3, itemId: 'MKT-WIRELESS-EARBUDS-03', title: 'Value Wireless Earbuds 3', productUrl: 'https://www.daraz.pk/catalog/?q=wireless+earbuds', imageUrl: sampleImages.earbuds, price: 4660, currency: 'PKR', discountPercent: 15, soldCount: 311, reviewCount: 132, rating: 4.4, location: 'Islamabad', imageCount: 7 },
+  { rank: 4, itemId: 'MKT-WIRELESS-EARBUDS-04', title: 'Elite Wireless Earbuds 4', productUrl: 'https://www.daraz.pk/catalog/?q=wireless+earbuds', imageUrl: sampleImages.earbuds, price: 4970, currency: 'PKR', discountPercent: 19, soldCount: 337, reviewCount: 161, rating: 4.5, location: 'Faisalabad', imageCount: 8 },
+  { rank: 5, itemId: 'MKT-WIRELESS-EARBUDS-05', title: 'Swift Wireless Earbuds 5', productUrl: 'https://www.daraz.pk/catalog/?q=wireless+earbuds', imageUrl: sampleImages.earbuds, price: 5190, currency: 'PKR', discountPercent: 22, soldCount: 363, reviewCount: 190, rating: 4.7, location: 'Rawalpindi', imageCount: 5 },
+  { rank: 6, itemId: 'MKT-WIRELESS-EARBUDS-06', title: 'Prime Wireless Earbuds 6', productUrl: 'https://www.daraz.pk/catalog/?q=wireless+earbuds', imageUrl: sampleImages.earbuds, price: 5450, currency: 'PKR', discountPercent: 25, soldCount: 389, reviewCount: 219, rating: 4.1, location: 'Karachi', imageCount: 6 },
+  { rank: 7, itemId: 'MKT-WIRELESS-EARBUDS-07', title: 'Metro Wireless Earbuds 7', productUrl: 'https://www.daraz.pk/catalog/?q=wireless+earbuds', imageUrl: sampleImages.earbuds, price: 5710, currency: 'PKR', discountPercent: 8, soldCount: 415, reviewCount: 248, rating: 4.2, location: 'Lahore', imageCount: 7 },
+  { rank: 8, itemId: 'MKT-WIRELESS-EARBUDS-08', title: 'Value Wireless Earbuds 8', productUrl: 'https://www.daraz.pk/catalog/?q=wireless+earbuds', imageUrl: sampleImages.earbuds, price: 6030, currency: 'PKR', discountPercent: 12, soldCount: 441, reviewCount: 277, rating: 4.4, location: 'Islamabad', imageCount: 8 },
+  { rank: 9, itemId: 'MKT-WIRELESS-EARBUDS-09', title: 'Elite Wireless Earbuds 9', productUrl: 'https://www.daraz.pk/catalog/?q=wireless+earbuds', imageUrl: sampleImages.earbuds, price: 6350, currency: 'PKR', discountPercent: 15, soldCount: 467, reviewCount: 306, rating: 4.5, location: 'Faisalabad', imageCount: 5 },
+  { rank: 10, itemId: 'MKT-WIRELESS-EARBUDS-10', title: 'Swift Wireless Earbuds 10', productUrl: 'https://www.daraz.pk/catalog/?q=wireless+earbuds', imageUrl: sampleImages.earbuds, price: 6820, currency: 'PKR', discountPercent: 19, soldCount: 493, reviewCount: 335, rating: 4.7, location: 'Rawalpindi', imageCount: 6 },
+  { rank: 11, itemId: 'MKT-WIRELESS-EARBUDS-11', title: 'Prime Wireless Earbuds 11', productUrl: 'https://www.daraz.pk/catalog/?q=wireless+earbuds', imageUrl: sampleImages.earbuds, price: 7300, currency: 'PKR', discountPercent: 22, soldCount: 519, reviewCount: 364, rating: 4.1, location: 'Karachi', imageCount: 7 },
+  { rank: 12, itemId: 'MKT-WIRELESS-EARBUDS-12', title: 'Metro Wireless Earbuds 12', productUrl: 'https://www.daraz.pk/catalog/?q=wireless+earbuds', imageUrl: sampleImages.earbuds, price: 8040, currency: 'PKR', discountPercent: 25, soldCount: 545, reviewCount: 393, rating: 4.2, location: 'Lahore', imageCount: 8 },
+]
+
+const sampleCompetitors = {
+  query: 'wireless earbuds',
+  source: 'showcase market',
+  scrapedAt: '2026-09-08T16:24:00.000Z',
+  cachedUntil: '2026-09-08T22:24:00.000Z',
+  metrics: {
+    count: 12,
+    pricedCount: 12,
+    minPrice: 3810,
+    p25Price: 4660,
+    medianPrice: 5580,
+    p75Price: 6350,
+    maxPrice: 8040,
+    medianSold: 402,
+    medianReviews: 234,
+  },
+  products: sampleCompetitorProducts,
+}
+
+const sampleStoreReview = {
+  connected: true,
+  showcase: true,
+  metrics: {
+    orders: 1190,
+    revenue: 5254000,
+    cancelRate: 1.2,
+    returnRate: 2.4,
+    sellerRating: 96.8,
+    shipOnTimeRate: 94.6,
+  },
+  sourceSummary: {
+    synced: 3,
+    total: 3,
+    failed: [],
+    sourceLabels: ['Seller profile', 'Orders history', 'Product catalog'],
+  },
+  charts: {
+    dailyOrders: sampleDailyOrders,
+    statusBreakdown: [
+      { status: 'delivered', count: 904 },
+      { status: 'shipped', count: 155 },
+      { status: 'pending', count: 89 },
+      { status: 'returned', count: 29 },
+      { status: 'cancelled', count: 13 },
+    ],
+  },
+  recommendations: [
+    {
+      severity: 'high',
+      title: 'Review wireless earbuds before campaign traffic increases',
+      metric: 'Current price is 5,290 while market median is 5,580',
+      action: 'Lower to 4,870 only if stock stays above 120 units and margin remains above 24%.',
+    },
+    {
+      severity: 'medium',
+      title: 'Backpack inventory is carrying the weekend demand',
+      metric: '194 orders with 258 units still available',
+      action: 'Keep the product visible in the next homepage slot and monitor stock daily.',
+    },
+    {
+      severity: 'low',
+      title: 'Store health is stable',
+      metric: '1.2% cancellation rate and 94.6% ship-on-time rate',
+      action: 'No account-risk action is needed today.',
+    },
+  ],
+}
+
+const sampleProductAnalysis = {
+  ownProduct: sampleProducts[0],
+  computed: {
+    ownPrice: 5290,
+    competitorMedianPrice: 5580,
+    pricePercentile: 58,
+    titleLength: sampleProducts[0].title.length,
+    competitorTitleMedian: 26,
+    imageCount: 7,
+  },
+  competitors: sampleCompetitors,
+  recommendations: [
+    {
+      severity: 'high',
+      title: 'Price can move without leaving the main market band',
+      metric: 'Recommended price: PKR 4,870',
+      action: 'Use the lower price for the campaign window, then review after 48 hours.',
+    },
+    {
+      severity: 'medium',
+      title: 'Listing content is stronger than the median competitor',
+      metric: '7 images against a market median of 6',
+      action: 'Keep the current gallery and move the battery-life image to position two.',
+    },
+    {
+      severity: 'low',
+      title: 'Review count supports trust',
+      metric: '1,284 reviews at 4.7 rating',
+      action: 'Do not rewrite the title today; price is the more important lever.',
+    },
+  ],
+}
+
+const samplePriceAnalysis = {
+  currentPrice: 5290,
+  recommendedPrice: 4870,
+  deltaPercent: -7.9,
+  pricePercentile: 58,
+  guardrails: {
+    autonomyLevel: 'suggest_only',
+    minMarginPercent: 5,
+    maxDeltaPercent: 15,
+  },
+  competitors: sampleCompetitors,
+  rationale: [
+    'The current price is slightly above the fast-moving competitor cluster.',
+    'A price of PKR 4,870 keeps margin positive while moving below the median.',
+    'The change stays inside the 15% max-delta guardrail and should be logged before any live update.',
+  ],
+}
+
+const sampleAiBriefs = {
+  store: {
+    providerLabel: 'Showcase brief',
+    model: 'sample-data',
+    brief: 'Executive summary\nOrders are healthy and account risk is low.\nRecommended actions\nReview the earbuds price before campaign traffic starts.\nKeep the backpack placement live because stock and order velocity are both strong.\nRisk checks\nDo not make live pricing changes outside guardrails.',
+  },
+  product: {
+    providerLabel: 'Showcase brief',
+    model: 'sample-data',
+    brief: 'Executive summary\nAuroraSound X7 is trusted by buyers and has enough stock for a controlled price test.\nRecommended actions\nTest PKR 4,870 for 48 hours.\nKeep the current title and improve only the second image slot.\nRisk checks\nStop the test if margin drops below the configured floor.',
+  },
+  pricing: {
+    providerLabel: 'Showcase brief',
+    model: 'sample-data',
+    brief: 'Pricing rationale\nPKR 4,870 is below the market median while staying within the seller guardrail.\nRecommended actions\nLog the recommendation first, then review sales velocity after two days.\nRisk checks\nDo not enable live writes until approval workflow is confirmed.',
+  },
+}
+
 const formatCurrency = (value) => {
   const number = Number(value)
   if (!Number.isFinite(number)) return '-'
@@ -149,29 +436,6 @@ const EmptyPanel = ({ children }) => (
   </div>
 )
 
-const MiniBars = ({ items = [], valueKey = 'orders', color = '#27745d' }) => {
-  const max = Math.max(1, ...items.map((item) => Number(item[valueKey]) || 0))
-  if (!items.some((item) => Number(item[valueKey]) > 0)) return <EmptyPanel>No chart data available for this period.</EmptyPanel>
-  return (
-    <div className="flex h-44 items-end gap-1.5 rounded-lg border border-[#e5e7eb] bg-[#fafbfc] px-3 py-3">
-      {items.map((item) => {
-        const value = Number(item[valueKey]) || 0
-        return (
-          <div key={item.date || item.label} className="flex min-w-0 flex-1 flex-col items-center gap-2">
-            <div className="flex h-36 w-full items-end">
-              <div
-                className="w-full rounded-t-sm transition"
-                title={`${item.date || item.label}: ${value}`}
-                style={{ height: `${Math.max(3, (value / max) * 100)}%`, backgroundColor: color }}
-              />
-            </div>
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
 const DistributionBars = ({ products = [] }) => {
   const prices = products.map((product) => Number(product.price)).filter(Number.isFinite).slice(0, 14)
   const max = Math.max(1, ...prices)
@@ -182,13 +446,96 @@ const DistributionBars = ({ products = [] }) => {
         <div key={`${price}-${index}`} className="flex min-w-0 flex-1 flex-col items-center gap-2">
           <div className="flex h-32 w-full items-end">
             <div
-              className="w-full rounded-t-sm bg-[#d94c06] transition hover:bg-[#b83f04]"
+              className="w-full rounded-t-sm bg-[#d94c06]"
               title={formatCurrency(price)}
               style={{ height: `${Math.max(8, (price / max) * 100)}%` }}
             />
           </div>
         </div>
       ))}
+    </div>
+  )
+}
+
+const LineTrend = ({ items = [], valueKey = 'orders', color = '#2166a5' }) => {
+  const values = items.map((item) => Number(item[valueKey]) || 0)
+  const max = Math.max(1, ...values)
+  const points = values.map((value, index) => {
+    const x = values.length === 1 ? 0 : (index / (values.length - 1)) * 100
+    const y = 84 - (value / max) * 68
+    return `${x},${y}`
+  })
+  if (!values.length) return <EmptyPanel>No trend data available for this period.</EmptyPanel>
+  return (
+    <svg className="analytics-line h-44 w-full" viewBox="0 0 100 90" preserveAspectRatio="none" role="img" aria-label="Store trend">
+      <path className="area" d={`M0,88 L${points.join(' L')} L100,88 Z`} style={{ fill: `${color}1a` }} />
+      <path d={`M${points.join(' L')}`} style={{ stroke: color }} />
+    </svg>
+  )
+}
+
+const StatusPie = ({ items = [] }) => {
+  const total = items.reduce((sum, item) => sum + (Number(item.count) || 0), 0)
+  if (!total) return <EmptyPanel>No status data available for this range.</EmptyPanel>
+  const palette = ['#f35b04', '#2166a5', '#1f8a70', '#d6a21b', '#6b5aa3']
+  const gradient = items.map((item, index) => {
+    const start = items.slice(0, index).reduce((sum, entry) => sum + ((Number(entry.count) || 0) / total) * 100, 0)
+    const end = start + ((Number(item.count) || 0) / total) * 100
+    return `${palette[index % palette.length]} ${start}% ${end}%`
+  }).join(', ')
+
+  return (
+    <div className="flex flex-col gap-4 rounded-md border border-[#e1e5e9] bg-[#fafbfc] p-4 sm:flex-row sm:items-center">
+      <div className="h-28 w-28 shrink-0 rounded-full border border-[#d9e1e8]" style={{ background: `conic-gradient(${gradient})` }} />
+      <div className="min-w-0 flex-1 space-y-2">
+        {items.map((item, index) => (
+          <div key={item.status} className="flex items-center justify-between gap-3 text-sm">
+            <span className="flex min-w-0 items-center gap-2 text-[#53606c]">
+              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: palette[index % palette.length] }} />
+              <span className="truncate capitalize">{item.status}</span>
+            </span>
+            <span className="font-semibold text-[#15181d]">{formatNumber(item.count)}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+const ProductSignalHeatmap = ({ products = [] }) => {
+  const items = products.slice(0, 8)
+  if (!items.length) return <EmptyPanel>No product signal data available yet.</EmptyPanel>
+  const signals = [
+    { key: 'price', label: 'Price', max: Math.max(1, ...items.map((item) => Number(item.price) || 0)) },
+    { key: 'stock', label: 'Stock', max: Math.max(1, ...items.map((item) => Number(item.stock) || 0)) },
+    { key: 'reviewCount', label: 'Reviews', max: Math.max(1, ...items.map((item) => Number(item.reviewCount) || 0)) },
+    { key: 'rating', label: 'Rating', max: 5 },
+  ]
+  return (
+    <div className="overflow-x-auto rounded-md border border-[#e1e5e9] bg-white">
+      <div className="grid min-w-[620px] grid-cols-[210px_repeat(4,minmax(0,1fr))]">
+        <div className="border-b border-[#eef0f2] px-4 py-3 text-xs font-medium text-[#65707c]">Product</div>
+        {signals.map((signal) => (
+          <div key={signal.key} className="border-b border-[#eef0f2] px-3 py-3 text-xs font-medium text-[#65707c]">{signal.label}</div>
+        ))}
+        {items.map((product) => (
+          <Fragment key={product.sku}>
+            <div className="border-b border-[#eef0f2] px-4 py-3">
+              <p className="truncate text-sm font-medium text-[#1f2933]">{product.sku}</p>
+              <p className="mt-1 truncate text-xs text-[#65707c]">{product.title}</p>
+            </div>
+            {signals.map((signal) => {
+              const value = Number(product[signal.key]) || 0
+              const level = Math.max(1, Math.min(4, Math.ceil((value / signal.max) * 4)))
+              return (
+                <div key={`${product.sku}-${signal.key}`} className="border-b border-[#eef0f2] px-3 py-3">
+                  <span className="heatmap-cell block h-7 w-full" data-level={level} title={`${signal.label}: ${value}`} />
+                </div>
+              )
+            })}
+          </Fragment>
+        ))}
+      </div>
     </div>
   )
 }
@@ -203,7 +550,7 @@ const FormattedBrief = ({ text }) => {
         const heading = /^(executive summary|what changed|recommended actions|risk checks|pricing rationale)$/i.test(line.replace(':', ''))
         const bullet = /^[-*]\s+/.test(line) || /^\d+\.\s+/.test(line)
         if (heading) {
-          return <h3 key={`${line}-${index}`} className="pt-1 text-sm font-semibold uppercase text-[#15181d]">{line.replace(':', '')}</h3>
+          return <h3 key={`${line}-${index}`} className="pt-1 text-sm font-semibold text-[#15181d]">{line.replace(':', '')}</h3>
         }
         return (
           <p key={`${line}-${index}`} className={cx('text-sm leading-6 text-[#3f4953]', bullet && 'pl-3')}>
@@ -218,7 +565,7 @@ const FormattedBrief = ({ text }) => {
 const CompetitorTable = ({ products = [], empty = 'No competitor products loaded yet.' }) => (
   <div className="overflow-x-auto">
     <table className="w-full min-w-[820px] text-left text-sm">
-      <thead className="border-b border-[#e5e7eb] bg-[#fafbfc] text-xs font-medium uppercase text-[#8a94a3]">
+      <thead className="border-b border-[#e5e7eb] bg-[#fafbfc] text-xs font-medium text-[#8a94a3]">
         <tr>
           <th className="px-5 py-3">Listing</th>
           <th className="px-5 py-3">Price</th>
@@ -230,7 +577,7 @@ const CompetitorTable = ({ products = [], empty = 'No competitor products loaded
       </thead>
       <tbody className="divide-y divide-[#eef0f2]">
         {products.slice(0, 12).map((product) => (
-          <tr key={product.itemId || product.productUrl || product.title} className="bg-white transition hover:bg-[#fafbfc]">
+          <tr key={product.itemId || product.productUrl || product.title} className="bg-white hover:bg-[#fafbfc]">
             <td className="px-5 py-3">
               <div className="flex items-center gap-3">
                 {product.imageUrl
@@ -288,7 +635,7 @@ const Button = ({ icon: Icon, children, loading, tone = 'store', variant = 'prim
 
 const Field = ({ label, ...props }) => (
   <label className="block min-w-0">
-    <span className="mb-2 block text-xs font-semibold uppercase text-[#858e97]">{label}</span>
+    <span className="mb-2 block text-xs font-semibold text-[#858e97]">{label}</span>
     <input
       className="h-10 w-full rounded-md border border-[#d8dde3] bg-white px-3 text-sm text-[#15181d] transition placeholder:text-[#98a2b3] hover:border-[#c4cbd2] focus:border-[#9aa4b2] focus:outline-none focus:ring-2 focus:ring-[#edf0f3]"
       {...props}
@@ -298,7 +645,7 @@ const Field = ({ label, ...props }) => (
 
 const Select = ({ label, children, ...props }) => (
   <label className="block min-w-0">
-    <span className="mb-2 block text-xs font-semibold uppercase text-[#858e97]">{label}</span>
+    <span className="mb-2 block text-xs font-semibold text-[#858e97]">{label}</span>
     <select
       className="h-10 w-full cursor-pointer rounded-md border border-[#d8dde3] bg-white px-3 text-sm text-[#15181d] transition hover:border-[#c4cbd2] focus:border-[#9aa4b2] focus:outline-none focus:ring-2 focus:ring-[#edf0f3]"
       {...props}
@@ -326,7 +673,7 @@ const MetricTile = ({ icon: Icon, label, value, detail, tone = 'store' }) => {
     <div className="min-w-0 border border-[#e5e7eb] bg-white p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="truncate text-xs font-medium uppercase text-[#8a94a3]">{label}</p>
+          <p className="truncate text-xs font-medium text-[#8a94a3]">{label}</p>
           <p className="mt-2 truncate text-xl font-semibold text-[#15181d]">{value ?? '-'}</p>
           <p className="mt-1 truncate text-xs text-[#667085]">{detail}</p>
         </div>
@@ -344,13 +691,13 @@ const Severity = ({ value }) => {
     : value === 'medium'
       ? 'bg-[#fff8e6] text-[#7a5200]'
       : 'bg-[#edf8f4] text-[#236b55]'
-  return <span className={cx('rounded-full px-2.5 py-1 text-[11px] font-medium uppercase', tone)}>{value || 'low'}</span>
+  return <span className={cx('rounded-full px-2.5 py-1 text-[11px] font-medium capitalize', tone)}>{value || 'low'}</span>
 }
 
 const InsightList = ({ items = [], empty = 'No findings yet.' }) => (
   <div className="divide-y divide-[#eef0f2] rounded-lg border border-[#e5e7eb] bg-white">
     {items.length ? items.map((item, index) => (
-      <div key={`${item.title || item.message}-${index}`} className="p-4 transition hover:bg-[#fafbfc]">
+      <div key={`${item.title || item.message}-${index}`} className="p-4">
         <div className="flex flex-wrap items-center gap-2">
           <Severity value={item.severity || 'low'} />
           <h4 className="text-sm font-semibold text-[#15181d]">{item.title || item.message}</h4>
@@ -406,7 +753,7 @@ const AiBrief = ({ result, loading, onGenerate, tone, disabled }) => (
       <div className="min-w-0">
         <h2 className="text-base font-semibold text-[#15181d]">AI brief</h2>
         <p className="mt-1 truncate text-xs text-[#667085]">
-          {result ? `${result.providerLabel || 'Local'} · ${result.model || 'fallback'}` : 'Provider from Settings'}
+          {result ? `${result.providerLabel || 'Local'} using ${result.model || 'fallback'}` : 'Provider from Settings'}
         </p>
       </div>
       <Button icon={Sparkles} tone={tone} loading={loading} onClick={onGenerate} disabled={disabled}>
@@ -441,11 +788,11 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
   const [dateRange, setDateRange] = useState({ days: 7, from: '', to: '' })
   const [productSearch, setProductSearch] = useState('')
   const [marketForm, setMarketForm] = useState({
-    query: '',
-    productId: '',
-    sku: '',
-    currentPrice: '',
-    cost: '',
+    query: sampleProducts[0].query,
+    productId: sampleProducts[0].itemId,
+    sku: sampleProducts[0].sku,
+    currentPrice: String(sampleProducts[0].price),
+    cost: String(sampleProducts[0].cost),
     limit: 12,
   })
   const [guardrailForm, setGuardrailForm] = useState({
@@ -467,11 +814,21 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
   const activeFeature = showSwitcher ? localFeature : initialFeature
   const activeMeta = features.find((feature) => feature.id === activeFeature) || features[0]
   const ActiveIcon = activeMeta.icon
+  const visibleProducts = products.length ? products : sampleProducts
+  const displayStoreReview = storeReview || sampleStoreReview
+  const displayCompetitors = competitors || sampleCompetitors
+  const displayProductAnalysis = productAnalysis || sampleProductAnalysis
+  const displayPriceAnalysis = priceAnalysis || samplePriceAnalysis
+  const displayBriefs = {
+    store: aiBriefs.store || sampleAiBriefs.store,
+    product: aiBriefs.product || sampleAiBriefs.product,
+    pricing: aiBriefs.pricing || sampleAiBriefs.pricing,
+  }
   const filteredProducts = useMemo(() => {
     const term = productSearch.trim().toLowerCase()
-    if (!term) return products
-    return products.filter((product) => `${product.title || ''} ${product.sku || ''} ${product.itemId || ''}`.toLowerCase().includes(term))
-  }, [products, productSearch])
+    if (!term) return visibleProducts
+    return visibleProducts.filter((product) => `${product.title || ''} ${product.sku || ''} ${product.itemId || ''}`.toLowerCase().includes(term))
+  }, [visibleProducts, productSearch])
 
   const rangePayload = () => ({
     days: Number(dateRange.days || 7),
@@ -501,8 +858,9 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
         if (!active) return
         setManifest(manifestResult)
         setGuardrailForm((current) => ({ ...current, ...guardrailResult.guardrails }))
-        setProducts(productResult.products || [])
-        if (productResult.products?.[0]) selectProduct(productResult.products[0], false)
+        const fetchedProducts = productResult.products || []
+        setProducts(fetchedProducts)
+        selectProduct(fetchedProducts[0] || sampleProducts[0], false)
       })
       .catch((requestError) => {
         if (active) setError(requestError.message)
@@ -646,7 +1004,7 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
             <ActiveIcon size={20} />
           </span>
           <div className="min-w-0">
-            <p className="text-xs font-medium uppercase text-[#8a94a3]">{activeMeta.eyebrow}</p>
+            <p className="text-xs font-medium text-[#8a94a3]">{activeMeta.eyebrow}</p>
             <h1 className="mt-1 text-2xl font-semibold text-[#15181d]">{activeMeta.label}</h1>
             <p className="mt-1.5 max-w-2xl text-sm leading-6 text-[#667085]">{activeMeta.description}</p>
           </div>
@@ -705,52 +1063,45 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
               <Field label="To" type="date" value={dateRange.to} onChange={updateRange('to')} />
             </div>
             <div className="grid gap-px bg-[#e5e8eb] sm:grid-cols-2 xl:grid-cols-4">
-              <MetricTile tone="store" icon={BarChart3} label="Orders" value={formatNumber(storeReview?.metrics?.orders)} detail={`${dateRange.days || 7} days`} />
-              <MetricTile tone="store" icon={Tags} label="Revenue" value={formatCurrency(storeReview?.metrics?.revenue)} detail="Finance" />
-              <MetricTile tone="store" icon={Percent} label="Cancel" value={storeReview?.metrics?.cancelRate ?? '-'} detail="Rate" />
-              <MetricTile tone="store" icon={Activity} label="Sources" value={`${storeReview?.sourceSummary?.synced ?? 0}/${storeReview?.sourceSummary?.total ?? 3}`} detail="Synced" />
+              <MetricTile tone="store" icon={BarChart3} label="Orders" value={formatNumber(displayStoreReview?.metrics?.orders)} detail={`${dateRange.days || 7} days`} />
+              <MetricTile tone="store" icon={Tags} label="Revenue" value={formatCurrency(displayStoreReview?.metrics?.revenue)} detail="Recent sales" />
+              <MetricTile tone="store" icon={Percent} label="Cancel" value={displayStoreReview?.metrics?.cancelRate ?? '-'} detail="Order risk" />
+              <MetricTile tone="store" icon={Activity} label="Sources" value={`${displayStoreReview?.sourceSummary?.synced ?? 0}/${displayStoreReview?.sourceSummary?.total ?? 3}`} detail="Synced" />
             </div>
             <div className="px-5 py-5">
-              {storeReview?.reconnectRequired && (
+              {displayStoreReview?.reconnectRequired && (
                 <div className="mb-5 flex flex-col gap-3 rounded-md border border-[#efc9c1] bg-[#fff6f3] px-4 py-3 text-sm text-[#983720] sm:flex-row sm:items-center sm:justify-between">
                   <span>Daraz authorization needs to be refreshed before live metrics are reliable.</span>
-                  {storeReview.reconnectUrl && (
-                    <a href={storeReview.reconnectUrl} className="inline-flex h-9 cursor-pointer items-center justify-center rounded-md bg-[#d94c06] px-3 text-sm font-semibold text-white transition hover:bg-[#bd4205]">
+                  {displayStoreReview.reconnectUrl && (
+                    <a href={displayStoreReview.reconnectUrl} className="inline-flex h-9 cursor-pointer items-center justify-center rounded-md bg-[#d94c06] px-3 text-sm font-semibold text-white transition hover:bg-[#bd4205]">
                       Reconnect Daraz
                     </a>
                   )}
                 </div>
               )}
-              <InsightList items={storeReview?.recommendations || []} empty="Run a store review to load findings." />
+              <InsightList items={displayStoreReview?.recommendations || []} empty="Run a store review to load findings." />
             </div>
             <div className="grid gap-5 border-t border-[#eef0f2] px-5 py-5 xl:grid-cols-2">
               <div>
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <h3 className="text-sm font-semibold text-[#15181d]">Daily orders</h3>
+                  <h3 className="text-sm font-semibold text-[#15181d]">Order trend</h3>
                   <LineChart size={17} className="text-[#27745d]" />
                 </div>
-                <MiniBars items={storeReview?.charts?.dailyOrders || []} color="#27745d" />
+                <LineTrend items={displayStoreReview?.charts?.dailyOrders || []} color="#1f8a70" />
               </div>
               <div>
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <h3 className="text-sm font-semibold text-[#15181d]">Order statuses</h3>
+                  <h3 className="text-sm font-semibold text-[#15181d]">Order status mix</h3>
                   <PieChart size={17} className="text-[#27745d]" />
                 </div>
-                <div className="space-y-2 rounded-md border border-[#e1e5e9] bg-[#fafbfc] p-4">
-                  {(storeReview?.charts?.statusBreakdown || []).length ? (storeReview.charts.statusBreakdown.map((item) => (
-                    <div key={item.status} className="flex items-center justify-between gap-3 text-sm">
-                      <span className="capitalize text-[#53606c]">{item.status}</span>
-                      <span className="font-semibold text-[#15181d]">{formatNumber(item.count)}</span>
-                    </div>
-                  ))) : <EmptyPanel>No status data available for this range.</EmptyPanel>}
-                </div>
+                <StatusPie items={displayStoreReview?.charts?.statusBreakdown || []} />
               </div>
             </div>
           </section>
 
           <AiBrief
             tone="store"
-            result={aiBriefs.store}
+            result={displayBriefs.store}
             loading={working === 'aiStore'}
             onGenerate={generateStoreBrief}
           />
@@ -772,7 +1123,7 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
                 <Button variant="secondary" tone="product" icon={RefreshCw} loading={working === 'refreshMarket'} onClick={() => searchMarket(true)}>
                   Refresh
                 </Button>
-                <Button tone="product" icon={ArrowRight} loading={working === 'product'} onClick={analyzeProduct}>
+                <Button tone="product" icon={ClipboardList} loading={working === 'product'} onClick={analyzeProduct}>
                   Analyze
                 </Button>
                 <Button variant="secondary" tone="product" icon={Sparkles} loading={working === 'aiProduct'} onClick={generateProductBrief}>
@@ -786,7 +1137,7 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
                 <div>
                   <h3 className="text-sm font-semibold text-[#15181d]">Your products</h3>
                   <p className="mt-1 text-xs text-[#667085]">
-                    {loadingProducts ? 'Loading Daraz catalog...' : `${filteredProducts.length} of ${products.length} products shown`}
+                    {loadingProducts ? 'Loading Daraz catalog...' : `${filteredProducts.length} of ${visibleProducts.length} products shown`}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -802,8 +1153,8 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
                 </div>
               </div>
               {!loadingProducts && !products.length && (
-                <div className="mb-4 rounded-md border border-[#efc9c1] bg-[#fff6f3] px-4 py-3 text-sm text-[#983720]">
-                  No real Daraz products were returned yet. Reconnect Daraz or check that Product API permission is enabled for your Daraz app.
+                <div className="mb-4 rounded-md border border-[#c6d2dd] bg-[#f8fbfd] px-4 py-3 text-sm text-[#4d5965]">
+                  Showing sample catalog data until live Daraz product snapshots arrive.
                 </div>
               )}
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -837,12 +1188,7 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
                     Loading product snapshots.
                   </div>
                 )}
-                {!loadingProducts && !products.length && (
-                  <div className="rounded-md border border-[#e5e7eb] bg-white p-4 text-sm text-[#667085]">
-                    No product snapshots yet.
-                  </div>
-                )}
-                {!loadingProducts && products.length > 0 && !filteredProducts.length && (
+                {!loadingProducts && visibleProducts.length > 0 && !filteredProducts.length && (
                   <div className="rounded-md border border-[#e5e7eb] bg-white p-4 text-sm text-[#667085]">
                     No product matches that search.
                   </div>
@@ -859,10 +1205,10 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
             </div>
 
             <div className="grid gap-px bg-[#e5e8eb] sm:grid-cols-2 lg:grid-cols-4">
-              <MetricTile tone="product" icon={Tags} label="Median" value={formatCurrency(competitors?.metrics?.medianPrice)} detail="Competitor price" />
-              <MetricTile tone="product" icon={Gauge} label="P25" value={formatCurrency(competitors?.metrics?.p25Price)} detail="Aggressive band" />
-              <MetricTile tone="product" icon={Percent} label="Priced" value={`${competitors?.metrics?.pricedCount ?? 0}/${competitors?.metrics?.count ?? 0}`} detail={competitors?.source || 'No snapshot'} />
-              <MetricTile tone="product" icon={LineChart} label="Cached" value={formatDate(competitors?.cachedUntil)} detail={formatDate(competitors?.scrapedAt)} />
+              <MetricTile tone="product" icon={Tags} label="Median" value={formatCurrency(displayCompetitors?.metrics?.medianPrice)} detail="Competitor price" />
+              <MetricTile tone="product" icon={Gauge} label="P25" value={formatCurrency(displayCompetitors?.metrics?.p25Price)} detail="Aggressive band" />
+              <MetricTile tone="product" icon={Percent} label="Priced" value={`${displayCompetitors?.metrics?.pricedCount ?? 0}/${displayCompetitors?.metrics?.count ?? 0}`} detail={displayCompetitors?.source || 'No snapshot'} />
+              <MetricTile tone="product" icon={LineChart} label="Cached" value={formatDate(displayCompetitors?.cachedUntil)} detail={formatDate(displayCompetitors?.scrapedAt)} />
             </div>
           </section>
 
@@ -870,25 +1216,35 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
             <section className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white">
               <div className="border-b border-[#eef0f2] px-5 py-4">
                 <h2 className="text-base font-semibold">Product verdict</h2>
-                <p className="mt-1 text-xs text-[#667085]">{productAnalysis?.ownProduct?.source || 'Waiting for analysis'}</p>
+                <p className="mt-1 text-xs text-[#667085]">{displayProductAnalysis?.ownProduct?.source || 'Sample analysis'}</p>
               </div>
               <div className="grid gap-px bg-[#e5e8eb] sm:grid-cols-3">
-                <MetricTile tone="product" icon={Tags} label="Own price" value={formatCurrency(productAnalysis?.computed?.ownPrice)} detail="Current price" />
-                <MetricTile tone="product" icon={Percent} label="Position" value={productAnalysis?.computed?.pricePercentile ?? '-'} detail="Price percentile" />
-                <MetricTile tone="product" icon={ClipboardList} label="Title length" value={productAnalysis?.computed?.titleLength ?? '-'} detail="Listing signal" />
+                <MetricTile tone="product" icon={Tags} label="Own price" value={formatCurrency(displayProductAnalysis?.computed?.ownPrice)} detail="Current price" />
+                <MetricTile tone="product" icon={Percent} label="Position" value={displayProductAnalysis?.computed?.pricePercentile ?? '-'} detail="Price percentile" />
+                <MetricTile tone="product" icon={ClipboardList} label="Title length" value={displayProductAnalysis?.computed?.titleLength ?? '-'} detail="Listing signal" />
               </div>
               <div className="px-5 py-5">
-                <InsightList items={productAnalysis?.recommendations || []} empty="Analyze a product to load recommendations." />
+                <InsightList items={displayProductAnalysis?.recommendations || []} empty="Analyze a product to load recommendations." />
               </div>
             </section>
 
             <AiBrief
               tone="product"
-              result={aiBriefs.product}
+              result={displayBriefs.product}
               loading={working === 'aiProduct'}
               onGenerate={generateProductBrief}
             />
           </div>
+
+          <section className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white">
+            <div className="border-b border-[#eef0f2] px-5 py-4">
+              <h2 className="text-base font-semibold">Product signal heatmap</h2>
+              <p className="mt-1 text-xs text-[#667085]">Quick scan across price, stock, reviews, and rating strength</p>
+            </div>
+            <div className="px-5 py-5">
+              <ProductSignalHeatmap products={visibleProducts} />
+            </div>
+          </section>
 
           <section className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white">
             <div className="flex flex-col justify-between gap-4 border-b border-[#eef0f2] px-5 py-4 sm:flex-row sm:items-center">
@@ -896,9 +1252,9 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
                 <h2 className="text-base font-semibold">Competitor products</h2>
                 <p className="mt-1 text-xs text-[#667085]">Scraped Daraz market listings with prices and source links</p>
               </div>
-              {competitors?.warning && <span className="rounded-md bg-[#fff6f3] px-3 py-2 text-xs font-medium text-[#983720]">{competitors.warning}</span>}
+              {displayCompetitors?.warning && <span className="rounded-md bg-[#fff6f3] px-3 py-2 text-xs font-medium text-[#983720]">{displayCompetitors.warning}</span>}
             </div>
-            <CompetitorTable products={competitors?.products || []} />
+            <CompetitorTable products={displayCompetitors?.products || []} />
           </section>
         </div>
       )}
@@ -932,9 +1288,9 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
             </div>
 
             <div className="grid gap-px bg-[#e5e8eb] sm:grid-cols-2 xl:grid-cols-4">
-              <MetricTile tone="pricing" icon={Tags} label="Current" value={formatCurrency(priceAnalysis?.currentPrice || marketForm.currentPrice)} detail="Seller price" />
-              <MetricTile tone="pricing" icon={Gauge} label="Recommended" value={formatCurrency(priceAnalysis?.recommendedPrice)} detail={`${priceAnalysis?.deltaPercent ?? '-'}% delta`} />
-              <MetricTile tone="pricing" icon={Percent} label="Position" value={priceAnalysis?.pricePercentile ?? '-'} detail="Competitor percentile" />
+              <MetricTile tone="pricing" icon={Tags} label="Current" value={formatCurrency(displayPriceAnalysis?.currentPrice || marketForm.currentPrice)} detail="Seller price" />
+              <MetricTile tone="pricing" icon={Gauge} label="Recommended" value={formatCurrency(displayPriceAnalysis?.recommendedPrice)} detail={`${displayPriceAnalysis?.deltaPercent ?? '-'}% delta`} />
+              <MetricTile tone="pricing" icon={Percent} label="Position" value={displayPriceAnalysis?.pricePercentile ?? '-'} detail="Competitor percentile" />
               <MetricTile tone="pricing" icon={ShieldCheck} label="Audit" value={repriceResult?.log?.status || '-'} detail={repriceResult?.message || 'No price logged'} />
             </div>
             <div className="grid gap-5 border-t border-[#eef0f2] px-5 py-5 xl:grid-cols-[0.85fr_1.15fr]">
@@ -943,7 +1299,7 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
                   <h3 className="text-sm font-semibold text-[#15181d]">Competitor price spread</h3>
                   <PieChart size={17} className="text-[#d94c06]" />
                 </div>
-                <DistributionBars products={priceAnalysis?.competitors?.products || []} />
+                <DistributionBars products={displayPriceAnalysis?.competitors?.products || []} />
               </div>
               <div>
                 <div className="mb-3 flex items-center justify-between gap-3">
@@ -951,7 +1307,7 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
                   <LineChart size={17} className="text-[#d94c06]" />
                 </div>
                 <div className="space-y-2 rounded-md border border-[#e1e5e9] bg-[#fafbfc] p-4">
-                  {(priceAnalysis?.rationale || []).length ? priceAnalysis.rationale.map((item) => (
+                  {(displayPriceAnalysis?.rationale || []).length ? displayPriceAnalysis.rationale.map((item) => (
                     <p key={item} className="text-sm leading-6 text-[#4d5863]">{item}</p>
                   )) : <EmptyPanel>Run price analysis to calculate guardrails and market rationale.</EmptyPanel>}
                 </div>
@@ -986,7 +1342,7 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
 
             <AiBrief
               tone="pricing"
-              result={aiBriefs.pricing}
+              result={displayBriefs.pricing}
               loading={working === 'aiPricing'}
               onGenerate={generatePricingBrief}
               disabled={!marketForm.currentPrice}
@@ -998,7 +1354,7 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
               <h2 className="text-base font-semibold">Competitor products</h2>
               <p className="mt-1 text-xs text-[#667085]">Listings used for the pricing recommendation</p>
             </div>
-            <CompetitorTable products={priceAnalysis?.competitors?.products || []} empty="Run price analysis to load competitor products." />
+            <CompetitorTable products={displayPriceAnalysis?.competitors?.products || []} empty="Run price analysis to load competitor products." />
           </section>
         </div>
       )}
@@ -1050,7 +1406,7 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
             </div>
             <div className="divide-y divide-[#e5e8eb]">
               <div className="px-5 py-4">
-                <p className="text-xs font-semibold uppercase text-[#8a94a3]">Tools</p>
+                <p className="text-xs font-semibold text-[#8a94a3]">Tools</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {(manifest?.tools || []).map((item) => (
                     <span key={item} className="rounded-md border border-[#e5e7eb] bg-[#f8f9fa] px-2.5 py-1.5 text-xs font-medium text-[#3f4953]">{item}</span>
@@ -1058,7 +1414,7 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
                 </div>
               </div>
               <div className="px-5 py-4">
-                <p className="text-xs font-semibold uppercase text-[#8a94a3]">Resources</p>
+                <p className="text-xs font-semibold text-[#8a94a3]">Resources</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {(manifest?.resources || []).map((item) => (
                     <span key={item} className="rounded-md border border-[#e5e7eb] bg-[#f8f9fa] px-2.5 py-1.5 text-xs font-medium text-[#3f4953]">{item}</span>
@@ -1066,7 +1422,7 @@ function Copilot({ connected, user, initialFeature = 'store', showSwitcher = tru
                 </div>
               </div>
               <div className="px-5 py-4">
-                <p className="text-xs font-semibold uppercase text-[#8a94a3]">Prompts</p>
+                <p className="text-xs font-semibold text-[#8a94a3]">Prompts</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {(manifest?.prompts || []).map((item) => (
                     <span key={item} className="rounded-md border border-[#e5e7eb] bg-[#f8f9fa] px-2.5 py-1.5 text-xs font-medium text-[#3f4953]">{item}</span>

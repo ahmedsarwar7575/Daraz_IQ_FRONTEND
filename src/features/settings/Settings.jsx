@@ -30,9 +30,31 @@ const providers = [
   },
 ]
 
+const sampleSettings = {
+  activeProvider: 'openrouter',
+  defaults: {
+    openaiModel: 'gpt-5.6-terra',
+    openrouterModel: 'openrouter/free',
+  },
+  providers: {
+    openrouter: {
+      ready: true,
+      hasUserKey: false,
+      hasPlatformKey: true,
+      model: 'openrouter/free',
+    },
+    openai: {
+      ready: false,
+      hasUserKey: false,
+      hasPlatformKey: false,
+      model: 'gpt-5.6-terra',
+    },
+  },
+}
+
 const Field = ({ label, ...props }) => (
   <label className="block min-w-0">
-    <span className="mb-2 block text-xs font-semibold uppercase text-[#858e97]">{label}</span>
+    <span className="mb-2 block text-xs font-semibold text-[#858e97]">{label}</span>
     <input
       className="h-10 w-full rounded-md border border-[#d8dde3] bg-white px-3 text-sm text-[#15181d] transition placeholder:text-[#98a2b3] focus:border-[#9aa4b2] focus:outline-none focus:ring-2 focus:ring-[#edf0f3]"
       {...props}
@@ -168,6 +190,7 @@ function Settings({ user }) {
     () => providers.find((provider) => provider.id === form.activeProvider) || providers[0],
     [form.activeProvider],
   )
+  const displaySettings = settings || sampleSettings
 
   const update = (field) => (event) => {
     setForm((current) => ({ ...current, [field]: event.target.value }))
@@ -214,7 +237,7 @@ function Settings({ user }) {
     <div>
       <div className="flex flex-col justify-between gap-4 border-b border-[#e5e7eb] pb-5 sm:flex-row sm:items-end">
         <div>
-          <p className="text-xs font-medium uppercase text-[#8a94a3]">Settings</p>
+          <p className="text-xs font-medium text-[#8a94a3]">Settings</p>
           <h1 className="mt-2 text-2xl font-semibold text-[#15181d]">AI provider</h1>
           <p className="mt-1.5 text-sm text-[#667085]">Choose the model route used by Copilot briefs for {user.name}.</p>
         </div>
@@ -256,10 +279,10 @@ function Settings({ user }) {
           title="OpenRouter"
           description="Default route for low-cost AI briefs"
           model={form.openrouterModel}
-          modelPlaceholder={settings?.defaults?.openrouterModel || 'openrouter/free'}
+          modelPlaceholder={displaySettings?.defaults?.openrouterModel || 'openrouter/free'}
           apiKey={form.openrouterApiKey}
-          keyPlaceholder={settings?.providers.openrouter.hasUserKey ? 'Saved key active' : 'Platform or user key'}
-          status={settings?.providers.openrouter || {}}
+          keyPlaceholder={displaySettings?.providers.openrouter.hasUserKey ? 'Saved key active' : 'Platform or user key'}
+          status={displaySettings?.providers.openrouter || {}}
           clear={form.clearOpenrouterKey}
           onModel={update('openrouterModel')}
           onKey={update('openrouterApiKey')}
@@ -270,10 +293,10 @@ function Settings({ user }) {
           title="OpenAI GPT"
           description="Direct OpenAI Responses API route"
           model={form.openaiModel}
-          modelPlaceholder={settings?.defaults?.openaiModel || 'gpt-5.6-terra'}
+          modelPlaceholder={displaySettings?.defaults?.openaiModel || 'gpt-5.6-terra'}
           apiKey={form.openaiApiKey}
-          keyPlaceholder={settings?.providers.openai.hasUserKey ? 'Saved key active' : 'Platform or user key'}
-          status={settings?.providers.openai || {}}
+          keyPlaceholder={displaySettings?.providers.openai.hasUserKey ? 'Saved key active' : 'Platform or user key'}
+          status={displaySettings?.providers.openai || {}}
           clear={form.clearOpenaiKey}
           onModel={update('openaiModel')}
           onKey={update('openaiApiKey')}
@@ -283,25 +306,25 @@ function Settings({ user }) {
 
       <section className="mt-6 grid overflow-hidden rounded-lg border border-[#e5e7eb] bg-[#eef0f2] sm:grid-cols-3">
         <div className="bg-white px-5 py-5">
-          <div className="flex items-center gap-2 text-xs font-medium uppercase text-[#8a94a3]">
+          <div className="flex items-center gap-2 text-xs font-medium text-[#8a94a3]">
             <Sparkles size={14} /> Active
           </div>
           <p className="mt-2 truncate text-xl font-semibold text-[#15181d]">{activeProvider.label}</p>
           <p className="mt-1 truncate text-xs text-[#667085]">Used by Copilot AI brief</p>
         </div>
         <div className="bg-white px-5 py-5">
-          <div className="flex items-center gap-2 text-xs font-medium uppercase text-[#8a94a3]">
+          <div className="flex items-center gap-2 text-xs font-medium text-[#8a94a3]">
             <KeyRound size={14} /> OpenRouter
           </div>
-          <p className="mt-2 truncate text-xl font-semibold text-[#15181d]">{settings?.providers.openrouter.ready ? 'Ready' : 'Needs key'}</p>
-          <p className="mt-1 truncate text-xs text-[#667085]">{settings?.providers.openrouter.model}</p>
+          <p className="mt-2 truncate text-xl font-semibold text-[#15181d]">{displaySettings?.providers.openrouter.ready ? 'Ready' : 'Needs key'}</p>
+          <p className="mt-1 truncate text-xs text-[#667085]">{displaySettings?.providers.openrouter.model}</p>
         </div>
         <div className="bg-white px-5 py-5">
-          <div className="flex items-center gap-2 text-xs font-medium uppercase text-[#8a94a3]">
+          <div className="flex items-center gap-2 text-xs font-medium text-[#8a94a3]">
             <Bot size={14} /> OpenAI GPT
           </div>
-          <p className="mt-2 truncate text-xl font-semibold text-[#15181d]">{settings?.providers.openai.ready ? 'Ready' : 'Needs key'}</p>
-          <p className="mt-1 truncate text-xs text-[#667085]">{settings?.providers.openai.model}</p>
+          <p className="mt-2 truncate text-xl font-semibold text-[#15181d]">{displaySettings?.providers.openai.ready ? 'Ready' : 'Needs key'}</p>
+          <p className="mt-1 truncate text-xs text-[#667085]">{displaySettings?.providers.openai.model}</p>
         </div>
       </section>
     </div>

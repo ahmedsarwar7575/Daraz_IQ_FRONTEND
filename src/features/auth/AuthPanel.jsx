@@ -171,7 +171,7 @@ function AuthPanel({ initialMode = 'login', onBackHome, onAuthenticated }) {
           <Brand dark />
 
           <div className="max-w-md">
-            <p className="mb-5 text-xs font-medium uppercase text-[#8a94a3]">Daraz intelligence</p>
+            <p className="mb-5 text-xs font-medium text-[#8a94a3]">Daraz intelligence</p>
             <h1 className="text-[38px] font-semibold leading-[1.15] text-[#15181d]">
               Your seller account, clearly in view.
             </h1>

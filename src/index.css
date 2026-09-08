@@ -2,45 +2,48 @@
 
 :root {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #15181d;
-  background: #f7f8fa;
+  color: #1f2933;
+  background: #f7f9f6;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   letter-spacing: 0;
-  --app-bg: #f7f8fa;
+  --app-bg: #f7f9f6;
   --app-panel: #ffffff;
-  --app-panel-muted: #fafbfc;
-  --app-border: #e5e7eb;
-  --app-border-strong: #d8dde3;
-  --app-text: #15181d;
-  --app-muted: #667085;
-  --app-soft: #8a94a3;
-  --app-brand: #ff541f;
-  --app-brand-dark: #e84916;
-  --app-ink: #20252c;
-  --surface-page: #08090b;
-  --surface-alt: #0b0d10;
-  --surface-panel: #121519;
-  --surface-panel-muted: #171a1f;
-  --surface-hover: rgba(255, 255, 255, 0.06);
-  --text-primary: #f7f8fa;
-  --text-secondary: rgba(255, 255, 255, 0.66);
-  --text-muted: rgba(255, 255, 255, 0.52);
-  --border: rgba(255, 255, 255, 0.13);
-  --border-subtle: rgba(255, 255, 255, 0.1);
-  --brand: #ff541f;
-  --brand-hover: #e84916;
-  --success: #26b56f;
-  --warning: #d8a520;
-  --error: #d74b3f;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-panel: 10px;
-  --container-wide: 1200px;
-  --container-readable: 760px;
-  --shadow-subtle: 0 18px 55px rgba(0, 0, 0, 0.22);
+  --app-panel-muted: #eef3f0;
+  --app-border: #d9e1e8;
+  --app-border-strong: #c6d2dd;
+  --app-text: #1f2933;
+  --app-muted: #65707c;
+  --app-soft: #8c98a4;
+  --app-brand: #f35b04;
+  --app-brand-dark: #c94702;
+  --app-blue: #2166a5;
+  --app-green: #1f8a70;
+  --app-error: #b42318;
+  --app-ink: #17212b;
+  --surface-page: #f7f9f6;
+  --surface-alt: #ffffff;
+  --surface-panel: #ffffff;
+  --surface-panel-muted: #eef3f0;
+  --surface-hover: #f1f5f2;
+  --text-primary: #17212b;
+  --text-secondary: #4d5965;
+  --text-muted: #65707c;
+  --border: #d9e1e8;
+  --border-subtle: #e6ecef;
+  --brand: #f35b04;
+  --brand-hover: #c94702;
+  --success: #1f8a70;
+  --warning: #a96f00;
+  --error: #b42318;
+  --radius-sm: 5px;
+  --radius-md: 7px;
+  --radius-panel: 14px;
+  --container-wide: 1180px;
+  --container-readable: 740px;
+  --shadow-subtle: 0 18px 55px rgba(31, 41, 51, 0.1);
 }
 
 * {
@@ -73,7 +76,7 @@ label {
 }
 
 button:focus-visible {
-  outline: 2px solid rgba(248, 86, 6, 0.42);
+  outline: 2px solid rgba(33, 102, 165, 0.42);
   outline-offset: 2px;
 }
 
@@ -83,7 +86,7 @@ select:focus-visible {
 }
 
 ::selection {
-  background: rgba(248, 86, 6, 0.16);
+  background: rgba(33, 102, 165, 0.16);
 }
 
 .app-scrollbar {

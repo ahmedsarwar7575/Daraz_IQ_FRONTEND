@@ -2,9 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import {
   BarChart3,
   CheckCircle2,
-  ChevronRight,
   CircleAlert,
-  Clock3,
   Gauge,
   LayoutDashboard,
   LogOut,
@@ -18,6 +16,7 @@ import {
   ShieldCheck,
   ShoppingBag,
   Trophy,
+  TrendingUp,
   Unplug,
   X,
 } from 'lucide-react'
@@ -65,6 +64,61 @@ const formatNumber = (value) => {
   return new Intl.NumberFormat('en').format(number)
 }
 
+const formatCurrency = (value) => {
+  const number = Number(value)
+  if (!Number.isFinite(number)) return '-'
+  return new Intl.NumberFormat('en-PK', {
+    style: 'currency',
+    currency: 'PKR',
+    maximumFractionDigits: 0,
+  }).format(number)
+}
+
+const demoDailyOrders = [
+  18, 22, 19, 24, 21, 28, 33, 25, 29, 31,
+  27, 36, 34, 38, 41, 37, 44, 39, 42, 47,
+  43, 50, 46, 54, 58, 53, 61, 57, 65, 68,
+].map((orders, index) => {
+  const date = new Date('2026-09-08T00:00:00.000Z')
+  date.setDate(date.getDate() - (29 - index))
+  return { date: date.toISOString().slice(0, 10), orders }
+})
+
+const demoStatus = {
+  connected: true,
+  connection: {
+    sellerId: 'PK-DIQ-784219',
+    sellerName: 'Urban Cart Studio',
+    country: 'Pakistan',
+    accountPlatform: 'daraz_pk',
+    connectedAt: '2026-06-08T10:30:00.000Z',
+  },
+  stats: {
+    ordersLast30Days: 1190,
+    products: 8,
+    synced: 3,
+    totalSources: 3,
+    lastSyncedAt: '2026-09-08T16:28:00.000Z',
+    revenue: 5254000,
+    charts: {
+      dailyOrders: demoDailyOrders,
+      statusBreakdown: [
+        { status: 'delivered', count: 904 },
+        { status: 'shipped', count: 155 },
+        { status: 'pending', count: 89 },
+        { status: 'returned', count: 29 },
+        { status: 'cancelled', count: 13 },
+      ],
+      topProducts: [
+        { title: 'AuroraSound X7 Wireless Earbuds with ANC', sku: 'AUR-EB-X7-BLK', orders: 286, units: 329 },
+        { title: 'GlowNest Vitamin C Serum 30ml', sku: 'GLOW-SERUM-C', orders: 238, units: 281 },
+        { title: 'UrbanCarry 18L Laptop Backpack', sku: 'URBAN-BP-18L', orders: 194, units: 211 },
+        { title: 'NovaFit S2 Bluetooth Calling Smart Watch', sku: 'NOVA-FIT-S2-GRY', orders: 151, units: 169 },
+      ],
+    },
+  },
+}
+
 const BrandMark = ({ compact = false }) => (
   <div className="flex min-w-0 items-center gap-3">
     <span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-lg border border-[#e5e7eb] bg-white">
@@ -83,7 +137,7 @@ const Metric = ({ icon: Icon, label, value, detail, description, tone }) => (
   <article className="min-w-0 rounded-lg border border-[#e5e7eb] bg-white p-4">
     <div className="flex items-start justify-between gap-4">
       <div className="min-w-0">
-        <p className="text-xs font-medium uppercase text-[#8a94a3]">{label}</p>
+        <p className="text-xs font-medium text-[#8a94a3]">{label}</p>
         <p className="mt-3 truncate text-2xl font-semibold text-[#15181d]">{value ?? '-'}</p>
         <p className="mt-1 truncate text-xs text-[#667085]">{detail}</p>
         {description && <p className="sr-only">{description}</p>}
@@ -112,7 +166,7 @@ const MiniBars = ({ items = [], valueKey = 'orders' }) => {
           <div key={item.date} className="flex min-w-0 flex-1 flex-col items-center gap-2">
             <div className="flex h-40 w-full items-end">
               <div
-                className="w-full rounded-t-sm bg-[#f85606] transition hover:bg-[#db4d05]"
+                className="w-full rounded-t-sm bg-[#f85606]"
                 title={`${item.date}: ${value} orders`}
                 style={{ height: `${Math.max(3, (value / max) * 100)}%` }}
               />
@@ -120,6 +174,43 @@ const MiniBars = ({ items = [], valueKey = 'orders' }) => {
           </div>
         )
       })}
+    </div>
+  )
+}
+
+const LineTrend = ({ items = [] }) => {
+  const values = items.map((item) => Number(item.orders) || 0)
+  const max = Math.max(1, ...values)
+  const points = values.map((value, index) => {
+    const x = values.length === 1 ? 0 : (index / (values.length - 1)) * 100
+    const y = 84 - (value / max) * 68
+    return `${x},${y}`
+  })
+  if (!values.length) return <EmptyState>No trend data available yet.</EmptyState>
+  return (
+    <svg className="analytics-line h-52 w-full" viewBox="0 0 100 90" preserveAspectRatio="none" role="img" aria-label="Thirty day order trend">
+      <path className="area" d={`M0,88 L${points.join(' L')} L100,88 Z`} />
+      <path d={`M${points.join(' L')}`} />
+    </svg>
+  )
+}
+
+const OrderHeatmap = ({ items = [] }) => {
+  const max = Math.max(1, ...items.map((item) => Number(item.orders) || 0))
+  if (!items.length) return <EmptyState>No order heatmap available yet.</EmptyState>
+  return (
+    <div>
+      <div className="heatmap-grid" aria-label="Order activity heatmap">
+        {items.slice(-30).map((item) => {
+          const value = Number(item.orders) || 0
+          const level = Math.max(0, Math.min(4, Math.ceil((value / max) * 4)))
+          return <span key={item.date} className="heatmap-cell" data-level={level} title={`${item.date}: ${value} orders`} />
+        })}
+      </div>
+      <div className="mt-3 flex items-center justify-between text-xs text-[#65707c]">
+        <span>Lower order load</span>
+        <span>Higher order load</span>
+      </div>
     </div>
   )
 }
@@ -161,7 +252,7 @@ const TopProducts = ({ items = [] }) => {
           <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-[#f5f6f8] text-sm font-semibold text-[#4b5563]">{index + 1}</span>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium text-[#242b33]">{item.title}</p>
-            <p className="mt-0.5 truncate text-xs text-[#8a94a3]">{item.sku || 'No SKU'} · {formatNumber(item.units)} units</p>
+            <p className="mt-0.5 truncate text-xs text-[#8a94a3]">{item.sku || 'No SKU'} with {formatNumber(item.units)} units</p>
           </div>
           <span className="text-sm font-semibold text-[#15181d]">{formatNumber(item.orders)}</span>
         </div>
@@ -252,8 +343,13 @@ function Dashboard({ user, onLogout }) {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const connection = status?.connection
-  const stats = status?.stats
+  const sampleMode = !status?.connected
+  const displayStatus = status?.connected ? status : demoStatus
+  const showcaseMode = Boolean(displayStatus?.showcase)
+  const usingDemoData = sampleMode || showcaseMode
+  const connection = displayStatus?.connection
+  const stats = displayStatus?.stats
+  const revenueValue = stats?.revenue ?? (sampleMode ? demoStatus.stats.revenue : null)
   const navClass = (target) => `flex h-10 w-full cursor-pointer items-center gap-3 rounded-md px-3 text-sm font-medium transition duration-200 ${
     view === target
       ? 'bg-[#20252c] text-white'
@@ -322,18 +418,27 @@ function Dashboard({ user, onLogout }) {
           {view === 'settings' ? (
             <SettingsPanel user={user} />
           ) : ['store', 'product', 'pricing', 'mcp'].includes(view) ? (
-            <Copilot connected={Boolean(status?.connected)} user={user} initialFeature={view} showSwitcher={false} />
+            <Copilot connected={Boolean(displayStatus?.connected)} user={user} initialFeature={view} showSwitcher={false} />
           ) : (
             <>
               <div className="flex flex-col justify-between gap-4 border-b border-[#e5e7eb] pb-5 sm:flex-row sm:items-end">
                 <div>
-                  <p className="text-xs font-medium uppercase text-[#8a94a3]">Dashboard</p>
+                  <p className="text-xs font-medium text-[#8a94a3]">Seller overview</p>
                   <h1 className="mt-2 text-2xl font-semibold text-[#15181d]">Seller overview</h1>
-                  <p className="mt-1.5 max-w-2xl text-sm text-[#667085]">Track store connection, orders, catalog health, and the next workflows from one place.</p>
+                  <p className="mt-1.5 max-w-2xl text-sm text-[#667085]">Start with today’s store signal, then move into the product or price that needs review.</p>
+                  {usingDemoData && (
+                    <p className="mt-2 inline-flex rounded-full border border-[#c6d2dd] bg-white px-3 py-1 text-xs font-medium text-[#4d5965]">
+                      {sampleMode ? 'Sample data is showing until Daraz is connected.' : 'Showcase data is loaded for this account.'}
+                    </p>
+                  )}
                 </div>
-                {status?.connected && (
+                {!sampleMode ? (
                   <button onClick={loadStatus} disabled={loading} className="flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md border border-[#d8dde3] bg-white px-3.5 text-sm font-medium text-[#344054] transition hover:bg-[#f8fafc] disabled:cursor-not-allowed disabled:opacity-60">
                     <RefreshCw size={15} className={loading ? 'animate-spin' : ''} /> Refresh
+                  </button>
+                ) : (
+                  <button onClick={connect} disabled={working} className="flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md bg-[#20252c] px-3.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60">
+                    <PlugZap size={15} /> Connect Daraz
                   </button>
                 )}
               </div>
@@ -350,36 +455,84 @@ function Dashboard({ user, onLogout }) {
                 <div className="grid min-h-[420px] place-items-center">
                   <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d8dde3] border-t-[#20252c]" />
                 </div>
-              ) : status?.connected ? (
+              ) : displayStatus?.connected ? (
                 <>
+                  <section className="dashboard-hero-panel mt-6 grid gap-5 rounded-lg p-5 xl:grid-cols-[1fr_360px]">
+                    <div>
+                      <p className="text-sm font-medium text-[#65707c]">Review today</p>
+                      <h2 className="mt-2 text-xl font-semibold text-[#15181d]">Wireless earbuds are above the competitor median.</h2>
+                      <p className="mt-2 max-w-2xl text-sm leading-6 text-[#4d5965]">
+                        The sample workspace recommends reviewing SKU AUR-EB-X7-BLK before the next campaign push.
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div>
+                        <span className="block text-xs text-[#65707c]">Median</span>
+                        <strong className="dashboard-figure mt-2 block text-lg text-[#15181d]">PKR 4,815</strong>
+                      </div>
+                      <div>
+                        <span className="block text-xs text-[#65707c]">Current</span>
+                        <strong className="dashboard-figure mt-2 block text-lg text-[#15181d]">PKR 5,290</strong>
+                      </div>
+                      <div>
+                        <span className="block text-xs text-[#65707c]">Move</span>
+                        <strong className="dashboard-figure mt-2 block text-lg text-[#c94702]">-8%</strong>
+                      </div>
+                    </div>
+                  </section>
+
                   <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                     <Metric icon={ShoppingBag} label="Orders" value={formatNumber(stats?.ordersLast30Days)} detail="Last 30 days" description="Recent order volume returned by the Daraz Orders API." tone="bg-[#fff1ea] text-[#d94c06]" />
                     <Metric icon={Package} label="Products" value={formatNumber(stats?.products)} detail="Total catalog items" description="All products found from the connected Daraz catalog." tone="bg-[#edf5fb] text-[#3477a6]" />
                     <Metric icon={ShieldCheck} label="Data sources" value={`${stats?.synced ?? 0}/${stats?.totalSources ?? 3}`} detail="Seller, orders, catalog" description="Data sources are Daraz API groups used to build the dashboard." tone="bg-[#edf8f4] text-[#2b8469]" />
-                    <Metric icon={Clock3} label="Last sync" value={stats?.lastSyncedAt ? new Date(stats.lastSyncedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-'} detail={formatDate(stats?.lastSyncedAt)} description="The latest successful dashboard refresh time." tone="bg-[#f2f0f8] text-[#695aa3]" />
+                    <Metric icon={TrendingUp} label="Revenue" value={formatCurrency(revenueValue)} detail={revenueValue ? 'Last 30 days' : 'Run Store Analyst'} description="Revenue represented in the seller workspace." tone="bg-[#f2f0f8] text-[#695aa3]" />
                   </section>
 
-                  <section className="mt-6 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+                  <section className="mt-6 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
                     <div className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white p-5">
                       <div className="mb-4 flex items-center justify-between gap-3">
                         <div>
-                          <h2 className="text-base font-semibold text-[#15181d]">Orders</h2>
-                          <p className="mt-1 text-xs text-[#667085]">Daily order volume from the last 30 days</p>
+                          <h2 className="text-base font-semibold text-[#15181d]">Order trend</h2>
+                          <p className="mt-1 text-xs text-[#667085]">Thirty-day direction</p>
                         </div>
-                        <PieChart size={18} className="text-[#f85606]" />
+                        <TrendingUp size={18} className="text-[#2166a5]" />
                       </div>
-                      <MiniBars items={stats?.charts?.dailyOrders || []} />
+                      <LineTrend items={stats?.charts?.dailyOrders || []} />
                     </div>
 
                     <div className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white p-5">
                       <div className="mb-4 flex items-center justify-between gap-3">
                         <div>
-                          <h2 className="text-base font-semibold text-[#15181d]">Status</h2>
-                          <p className="mt-1 text-xs text-[#667085]">Distribution from recent Daraz orders</p>
+                          <h2 className="text-base font-semibold text-[#15181d]">Order heatmap</h2>
+                          <p className="mt-1 text-xs text-[#667085]">Daily load by intensity</p>
                         </div>
-                        <PieChart size={18} className="text-[#2f6f9f]" />
+                        <BarChart3 size={18} className="text-[#1f8a70]" />
+                      </div>
+                      <OrderHeatmap items={stats?.charts?.dailyOrders || []} />
+                    </div>
+                  </section>
+
+                  <section className="mt-6 grid gap-6 xl:grid-cols-[0.88fr_1.12fr]">
+                    <div className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white p-5">
+                      <div className="mb-4 flex items-center justify-between gap-3">
+                        <div>
+                          <h2 className="text-base font-semibold text-[#15181d]">Order status</h2>
+                          <p className="mt-1 text-xs text-[#667085]">Recent fulfillment mix</p>
+                        </div>
+                        <PieChart size={18} className="text-[#2166a5]" />
                       </div>
                       <PieBreakdown items={stats?.charts?.statusBreakdown || []} />
+                    </div>
+
+                    <div className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white p-5">
+                      <div className="mb-4 flex items-center justify-between gap-3">
+                        <div>
+                          <h2 className="text-base font-semibold text-[#15181d]">Daily orders</h2>
+                          <p className="mt-1 text-xs text-[#667085]">Bar view for quick comparison</p>
+                        </div>
+                        <BarChart3 size={18} className="text-[#f85606]" />
+                      </div>
+                      <MiniBars items={stats?.charts?.dailyOrders || []} />
                     </div>
                   </section>
 
@@ -420,9 +573,15 @@ function Dashboard({ user, onLogout }) {
                     </div>
                     <div className="flex flex-col justify-between gap-4 border-t border-[#eef0f2] px-5 py-4 sm:flex-row sm:items-center">
                       <p className="text-xs text-[#667085]">Access credentials are encrypted at rest.</p>
-                      <button onClick={disconnect} disabled={working} className="flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md border border-[#e1b8ae] px-3.5 text-sm font-medium text-[#a33a22] transition hover:bg-[#fff8f6] disabled:cursor-not-allowed disabled:opacity-60">
-                        <Unplug size={15} /> Disconnect account
-                      </button>
+                      {sampleMode ? (
+                        <button onClick={connect} disabled={working} className="flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md bg-[#20252c] px-3.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60">
+                          <PlugZap size={15} /> Connect Daraz
+                        </button>
+                      ) : (
+                        <button onClick={disconnect} disabled={working} className="flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md border border-[#e1b8ae] px-3.5 text-sm font-medium text-[#a33a22] transition hover:bg-[#fff8f6] disabled:cursor-not-allowed disabled:opacity-60">
+                          <Unplug size={15} /> Disconnect account
+                        </button>
+                      )}
                     </div>
                   </section>
                 </>
@@ -436,11 +595,11 @@ function Dashboard({ user, onLogout }) {
                         Authorize daraziq.store through Daraz to view seller details, order volume, and product totals.
                       </p>
                       <button onClick={connect} disabled={working} className="mt-6 flex h-10 cursor-pointer items-center gap-2 rounded-md bg-[#f85606] px-4 text-sm font-semibold text-white transition hover:bg-[#db4d05] disabled:cursor-not-allowed disabled:opacity-60">
-                        {working ? 'Opening Daraz...' : 'Connect Daraz'} <ChevronRight size={16} />
+                        {working ? 'Opening Daraz...' : 'Connect Daraz'}
                       </button>
                     </div>
                     <div className="border-t border-[#eef0f2] bg-[#fafbfc] p-6 lg:border-l lg:border-t-0">
-                      <p className="text-xs font-semibold uppercase text-[#8a94a3]">Connection scope</p>
+                      <p className="text-xs font-semibold text-[#8a94a3]">Connection scope</p>
                       <div className="mt-5 space-y-4">
                         {['Seller profile', 'Orders summary', 'Product catalog'].map((label) => (
                           <div key={label} className="flex items-center gap-3 text-sm text-[#4b5563]">

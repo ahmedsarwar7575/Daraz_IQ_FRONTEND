@@ -87,8 +87,8 @@ function App() {
 
   if (session.loading) {
     return (
-      <main className="grid min-h-screen place-items-center bg-[#08090b]">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/15 border-t-[#ff541f]" />
+      <main className="grid min-h-screen place-items-center bg-[#f7f9f6]">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d9e1e8] border-t-[#2166a5]" />
       </main>
     )
   }

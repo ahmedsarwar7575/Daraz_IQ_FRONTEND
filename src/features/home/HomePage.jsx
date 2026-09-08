@@ -1,18 +1,18 @@
 import {
-  ArrowRight,
-  ArrowUpRight,
+  Activity,
   BarChart3,
   Bot,
   Check,
   ChevronDown,
   Gauge,
+  LineChart,
   LockKeyhole,
   Mail,
   MapPin,
   Search,
   Server,
   ShieldCheck,
-  Sparkles,
+  ShoppingBag,
   Store,
   TrendingUp,
 } from 'lucide-react'
@@ -21,199 +21,145 @@ import './HomePage.css'
 const navItems = [
   { page: 'home', label: 'Home', path: '/' },
   { page: 'services', label: 'Services', path: '/services' },
-  { page: 'contact', label: 'Contact us', path: '/contact' },
-  { page: 'about', label: 'About us', path: '/about' },
+  { page: 'about', label: 'About', path: '/about' },
+  { page: 'contact', label: 'Contact', path: '/contact' },
 ]
 
 const landingImages = {
   hero: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1800&q=82',
   operations: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=1200&q=80',
-  dashboard: 'https://images.unsplash.com/photo-1504868481965-a7679ed88ac1?auto=format&fit=crop&w=1200&q=80',
 }
 
 const heroStats = [
-  { label: 'Store data', value: 'Live KPIs' },
-  { label: 'Market signals', value: 'Price bands' },
-  { label: 'MCP tools', value: '10+' },
+  { label: 'Orders reviewed', value: '1,190' },
+  { label: 'Products tracked', value: '8' },
+  { label: 'Price change suggested', value: '-8%' },
 ]
 
-const features = [
+const featureGroups = [
   {
-    title: 'Store Analyst',
-    text: 'Monitor orders, sync health, KPI snapshots, trends, and anomaly signals from your Daraz account.',
+    title: 'Know what changed',
+    text: 'See orders, revenue, seller rating, fulfillment status, and the SKUs driving the week.',
     icon: BarChart3,
   },
   {
-    title: 'Product Lab',
-    text: 'Compare your products with competitor listings, market prices, reviews, sales signals, and source links.',
+    title: 'Compare your product',
+    text: 'Check your listing against competitor price, sales, reviews, image depth, and rank signals.',
     icon: Search,
   },
   {
-    title: 'Pricing Guardrails',
-    text: 'Analyze price changes using cost, competitor ranges, margin limits, and a clean reprice audit trail.',
+    title: 'Price with limits',
+    text: 'Review the recommended price beside margin, floor, ceiling, and daily movement rules.',
     icon: Gauge,
   },
   {
-    title: 'MCP Access',
-    text: 'Connect Claude, ChatGPT-compatible agents, or other MCP clients to the same seller intelligence tools.',
+    title: 'Connect an AI client',
+    text: 'Authorize MCP clients so they can use the same seller tools without guessing account context.',
     icon: Server,
   },
 ]
 
-const proofStats = [
+const workflowRows = [
   {
-    value: 'OAuth',
-    title: 'Secure Daraz connection',
-    detail: 'Seller tokens stay encrypted at rest',
-    icon: ShieldCheck,
-  },
-  {
-    value: 'Live',
-    title: 'Competitor discovery',
-    detail: 'Search market listings with browser automation',
+    title: 'Connect the seller account',
+    text: 'Daraz authorization brings seller profile, order, and catalog context into the workspace.',
     icon: Store,
   },
   {
-    value: 'AI',
-    title: 'Business briefs',
-    detail: 'OpenAI or OpenRouter provider routing',
-    icon: Bot,
+    title: 'Review the current signal',
+    text: 'Charts and snapshots show where the store is healthy and where a product needs attention.',
+    icon: Activity,
   },
   {
-    value: 'Logs',
-    title: 'Reprice history',
-    detail: 'Every pricing action gets an audit trail',
-    icon: LockKeyhole,
-  },
-]
-
-const workflowSteps = [
-  {
-    step: '01',
-    title: 'Connect Daraz',
-    text: 'Authorize the seller account once and bring orders, products, and account status into one workspace.',
-    icon: Store,
-  },
-  {
-    step: '02',
-    title: 'Read the market',
-    text: 'Compare catalog items with competitor listings, price bands, reviews, and listing signals.',
-    icon: Search,
-  },
-  {
-    step: '03',
-    title: 'Act with control',
-    text: 'Use AI briefs, margin checks, and guarded recommendations before making operational changes.',
-    icon: Gauge,
-  },
-]
-
-const mcpStats = [
-  { value: '10+', label: 'seller tools' },
-  { value: '7', label: 'resources' },
-  { value: '3', label: 'agent prompts' },
-]
-
-const mcpCommands = [
-  'get_store_metrics',
-  'search_competitors',
-  'analyze_product',
-  'analyze_price',
-  'weekly_store_review',
-]
-
-const trustLayers = [
-  {
-    title: 'OAuth connection',
-    text: 'Seller access is scoped through Daraz authorization.',
+    title: 'Approve the next move',
+    text: 'Pricing and AI outputs stay grounded in the same data, with guardrails visible before action.',
     icon: ShieldCheck,
   },
+]
+
+const trustRows = [
   {
-    title: 'Encrypted keys',
-    text: 'Daraz tokens and AI provider keys stay encrypted at rest.',
+    title: 'Seller access is scoped',
+    text: 'Connected clients and dashboard requests resolve to the signed-in seller workspace.',
     icon: LockKeyhole,
   },
   {
-    title: 'Human review',
-    text: 'Recommendations come first, live writes stay guarded.',
+    title: 'Recommendations show their evidence',
+    text: 'Price bands, competitor counts, source status, and history stay visible near the action.',
+    icon: LineChart,
+  },
+  {
+    title: 'Live writes stay controlled',
+    text: 'Guardrails and logs keep pricing recommendations reviewable before anything changes.',
     icon: Check,
-  },
-  {
-    title: 'Agent ready',
-    text: 'MCP clients use the same protected seller workspace.',
-    icon: Server,
   },
 ]
 
 const faqs = [
   {
-    question: 'What is daraziq.store used for?',
-    answer: 'It helps Daraz sellers understand store performance, compare products against competitors, and make safer pricing decisions.',
+    question: 'What does daraziq.store help me do?',
+    answer: 'It helps Daraz sellers review store performance, compare products, and price with guardrails from one workspace.',
   },
   {
-    question: 'Do I need to connect my Daraz seller account?',
-    answer: 'Yes for live seller metrics. Competitor benchmarking and cached workflows can still work when available.',
+    question: 'Do I have to connect Daraz?',
+    answer: 'Live seller metrics require a Daraz connection. Demo and cached views can still show how the workflow works.',
   },
   {
-    question: 'Can AI agents use my seller tools?',
-    answer: 'Yes. The app exposes OAuth-protected MCP tools for compatible AI clients, scoped to the authenticated seller.',
+    question: 'Can an AI client use my seller tools?',
+    answer: 'Yes. MCP access is authorized and scoped to the signed-in seller account.',
   },
   {
-    question: 'Are seller credentials stored safely?',
-    answer: 'Daraz access credentials and user AI keys are encrypted at rest and can be removed from the dashboard.',
-  },
-  {
-    question: 'Does it change prices automatically?',
-    answer: 'Live writes are guarded and disabled unless explicitly configured. Recommendations and logs come first.',
+    question: 'Will the app change prices by itself?',
+    answer: 'No. Pricing recommendations are review-first and bounded by the guardrails shown in the product.',
   },
 ]
 
 const contactCards = [
   {
     title: 'Product support',
-    text: 'Questions about connecting Daraz, seller metrics, or competitor workflows.',
+    text: 'Help with seller connection, dashboard data, and workspace access.',
     value: 'support@daraziq.store',
     icon: Mail,
   },
   {
     title: 'MCP setup',
-    text: 'Connect Claude, GPT-compatible agents, or other MCP clients to your seller tools.',
-    value: 'Remote connector ready',
+    text: 'Guidance for connecting an external AI client to the seller tools.',
+    value: 'OAuth protected',
     icon: Server,
   },
   {
     title: 'Seller workspace',
-    text: 'Built for Daraz sellers who need cleaner decisions from store and market data.',
-    value: 'Daraz intelligence',
+    text: 'Built for Daraz sellers reviewing store and product decisions.',
+    value: 'Pakistan marketplace focus',
     icon: MapPin,
   },
 ]
 
 const pageTitles = {
   services: {
-    kicker: 'Services',
-    title: 'Seller tools that turn marketplace data into action.',
-    text: 'Each page in the console maps to a focused seller workflow: store performance, product benchmarking, pricing control, and AI/MCP access.',
+    label: 'Services',
+    title: 'The workspace is organized around seller decisions.',
+    text: 'Review store health, compare one product, check the recommended price, and connect MCP clients from separate focused pages.',
   },
   about: {
-    kicker: 'About us',
-    title: 'Built for Daraz sellers who want clarity before action.',
-    text: 'daraziq.store brings seller data, competitor signals, AI summaries, and pricing safety into one focused operating system.',
+    label: 'About',
+    title: 'daraziq.store exists to make seller decisions easier to review.',
+    text: 'The product brings Daraz data, competitor signals, AI summaries, and pricing controls into one account-scoped workspace.',
   },
   contact: {
-    kicker: 'Contact us',
-    title: "Let's connect your seller workflow.",
-    text: 'Reach out for support, MCP setup, Daraz connection guidance, or product feedback.',
+    label: 'Contact',
+    title: 'Get help connecting your seller workflow.',
+    text: 'Reach out for account connection support, MCP setup, or product feedback.',
   },
   privacy: {
-    kicker: 'Privacy policy',
-    title: 'Clear data practices for connected seller workspaces.',
-    text: 'daraziq.store is designed to keep seller data scoped, protected, and removable from the product.',
+    label: 'Privacy policy',
+    title: 'Seller data should stay scoped, protected, and removable.',
+    text: 'This policy explains how daraziq.store handles account access, connected marketplace data, AI workflows, and logs.',
   },
   terms: {
-    kicker: 'Terms and conditions',
-    title: 'A practical agreement for using daraziq.store.',
-    text: 'These terms explain how sellers may use the workspace, AI workflows, and MCP access responsibly.',
+    label: 'Terms and conditions',
+    title: 'Use daraziq.store as a decision-support workspace.',
+    text: 'These terms explain responsible use of seller analytics, pricing recommendations, AI briefs, and MCP access.',
   },
 }
 
@@ -221,69 +167,26 @@ const legalContent = {
   privacy: {
     updated: 'September 8, 2026',
     sections: [
-      {
-        title: 'Information We Use',
-        text: 'We use account profile details, authentication status, connected Daraz seller metadata, product snapshots, store metrics, competitor search results, pricing guardrails, and workflow logs to operate the workspace.',
-      },
-      {
-        title: 'How The Product Uses Data',
-        text: 'Seller data is used to show dashboards, generate store and product analysis, prepare AI briefs, support MCP tools, and keep pricing recommendations traceable.',
-      },
-      {
-        title: 'Credentials And Access',
-        text: 'Daraz access tokens and user-supplied AI provider keys are encrypted at rest. Sellers can disconnect Daraz and remove stored access from the dashboard.',
-      },
-      {
-        title: 'AI And MCP Workflows',
-        text: 'AI briefs and MCP responses are generated from the authenticated seller workspace. MCP clients must authorize through the product before they can access account-scoped tools.',
-      },
-      {
-        title: 'Data Retention',
-        text: 'Operational snapshots and audit logs are retained to support reporting, trend analysis, and pricing history. Account removal or disconnect requests are handled through the product support process.',
-      },
-      {
-        title: 'No Public Sale Of Seller Data',
-        text: 'daraziq.store is not designed to publish or sell individual seller account data. Product data is used to provide the seller intelligence service.',
-      },
+      ['Information we use', 'We use account profile details, authentication status, connected Daraz seller metadata, product snapshots, store metrics, competitor search results, pricing guardrails, and workflow logs to operate the workspace.'],
+      ['How the product uses data', 'Seller data powers dashboards, store reviews, product comparisons, AI briefs, MCP responses, and pricing history.'],
+      ['Credentials and access', 'Daraz access tokens and user-supplied AI provider keys are encrypted at rest. Sellers can disconnect Daraz and remove stored access from the dashboard.'],
+      ['AI and MCP workflows', 'AI briefs and MCP responses are generated from the authenticated seller workspace. MCP clients must authorize before they can access seller-scoped tools.'],
+      ['Retention', 'Operational snapshots and audit logs are retained for reporting, trend analysis, and pricing history. Account removal requests are handled through support.'],
+      ['No public sale of seller data', 'daraziq.store is not designed to publish or sell individual seller data. Product data is used to provide the seller intelligence service.'],
     ],
   },
   terms: {
     updated: 'September 8, 2026',
     sections: [
-      {
-        title: 'Product Use',
-        text: 'daraziq.store provides seller intelligence, marketplace analysis, AI-assisted summaries, pricing guardrails, and MCP access for Daraz seller workflows.',
-      },
-      {
-        title: 'Seller Responsibility',
-        text: 'Sellers are responsible for keeping their account access secure, reviewing recommendations before acting, and ensuring marketplace activity follows Daraz rules and local law.',
-      },
-      {
-        title: 'AI Recommendations',
-        text: 'AI briefs and pricing suggestions are decision-support outputs. Sellers should review source metrics, margin limits, stock position, and business context before making changes.',
-      },
-      {
-        title: 'MCP Connector Access',
-        text: 'External MCP clients can only access the workspace after authorization. Sellers are responsible for the clients they connect and the actions they request through those clients.',
-      },
-      {
-        title: 'Service Availability',
-        text: 'Marketplace APIs, AI providers, browser automation, and third-party services can change or become unavailable. daraziq.store may update workflows to preserve product reliability.',
-      },
-      {
-        title: 'Acceptable Use',
-        text: 'The product may not be used to abuse marketplace systems, scrape prohibited content, interfere with other sellers, or attempt unauthorized access to accounts or data.',
-      },
+      ['Product use', 'daraziq.store provides seller intelligence, marketplace analysis, AI-assisted summaries, pricing guardrails, and MCP access for Daraz seller workflows.'],
+      ['Seller responsibility', 'Sellers are responsible for keeping account access secure, reviewing recommendations before acting, and following marketplace rules and local law.'],
+      ['AI recommendations', 'AI briefs and pricing suggestions are decision-support outputs. Sellers should review source metrics, margins, stock, and business context before making changes.'],
+      ['MCP connector access', 'External MCP clients can access the workspace only after authorization. Sellers are responsible for the clients they connect and the actions they request.'],
+      ['Service availability', 'Marketplace APIs, AI providers, browser automation, and third-party services can change or become unavailable. daraziq.store may update workflows to preserve reliability.'],
+      ['Acceptable use', 'The product may not be used to abuse marketplace systems, scrape prohibited content, interfere with other sellers, or attempt unauthorized access.'],
     ],
   },
 }
-
-const FooterColumn = ({ title, children }) => (
-  <div>
-    <h3>{title}</h3>
-    <div className="footer-links">{children}</div>
-  </div>
-)
 
 const SiteHeader = ({ page, onNavigate, onLogin }) => (
   <header className="landing-nav">
@@ -297,8 +200,9 @@ const SiteHeader = ({ page, onNavigate, onLogin }) => (
       }}
     >
       <img src="/favicon.svg" alt="" />
+      <span>daraziq.store</span>
     </a>
-    <nav aria-label="Landing page navigation">
+    <nav aria-label="Website navigation">
       {navItems.map((item) => (
         <a
           key={item.page}
@@ -313,43 +217,30 @@ const SiteHeader = ({ page, onNavigate, onLogin }) => (
         </a>
       ))}
     </nav>
-    <button className="nav-login" onClick={onLogin}>Login</button>
+    <button className="nav-login" onClick={onLogin}>Log in</button>
   </header>
 )
 
-const HeroProductPanel = () => (
-  <aside className="hero-product-panel" aria-label="Product workspace preview">
-    <div className="hero-panel-header">
-      <div>
-        <img src="/favicon.svg" alt="" />
-        <span>daraziq.store</span>
-      </div>
-      <strong>Live workspace</strong>
+const HeroMetricBoard = () => (
+  <div className="hero-metric-board" aria-label="Sample seller workspace data">
+    <div className="metric-board-heading">
+      <span>Today</span>
+      <strong>Review price for AUR-EB-X7-BLK</strong>
     </div>
-    <div className="hero-panel-metrics">
-      <div>
-        <span>Orders</span>
-        <strong>1.2K</strong>
-      </div>
-      <div>
-        <span>Products</span>
-        <strong>342</strong>
-      </div>
-      <div>
-        <span>Sources</span>
-        <strong>3/3</strong>
-      </div>
+    <div className="metric-board-grid">
+      {heroStats.map((item) => (
+        <div key={item.label}>
+          <span>{item.label}</span>
+          <strong>{item.value}</strong>
+        </div>
+      ))}
     </div>
-    <div className="hero-panel-review">
-      <span>Sample analysis</span>
-      <h2>Wireless Earbuds Pro</h2>
-      <ul>
-        <li><Check size={15} /> Competitor price band detected</li>
-        <li><Check size={15} /> Margin guardrail healthy</li>
-        <li><Check size={15} /> AI brief ready for review</li>
-      </ul>
+    <div className="mini-chart" aria-hidden="true">
+      {[38, 46, 44, 58, 61, 68, 74, 70, 82, 88, 84, 93].map((height, index) => (
+        <span key={index} style={{ height: `${height}%` }} />
+      ))}
     </div>
-  </aside>
+  </div>
 )
 
 const HomeScreen = ({ page, onNavigate, onLogin, onGetStarted }) => (
@@ -358,63 +249,38 @@ const HomeScreen = ({ page, onNavigate, onLogin, onGetStarted }) => (
     style={{ '--hero-image': `url("${landingImages.hero}")` }}
   >
     <SiteHeader page={page} onNavigate={onNavigate} onLogin={onLogin} />
-
     <div className="hero-layout">
       <div className="hero-copy">
-        <p className="hero-label">Daraz seller intelligence</p>
-        <h1>
-          One workspace for store performance, product research, and MCP access.
-        </h1>
+        <p className="plain-label">Daraz seller decision console</p>
+        <h1>Review the next seller decision before you change the store.</h1>
         <p>
-          Connect Daraz, review seller metrics, compare products with market listings,
-          and give AI clients controlled access to the same operational tools.
+          See store health, product context, competitor price bands, and pricing guardrails
+          in one light workspace made for Daraz operators.
         </p>
         <div className="hero-actions">
-          <button onClick={onGetStarted}>Get Started</button>
-          <button className="ghost-action" onClick={() => onNavigate('services')}>See Details</button>
+          <button onClick={onGetStarted}>Open workspace</button>
+          <button className="secondary-action" onClick={() => onNavigate('services')}>View services</button>
         </div>
       </div>
-
-      <HeroProductPanel />
-    </div>
-
-    <div className="hero-stats">
-      {heroStats.map((item) => (
-        <div key={item.label}>
-          <p>{item.label}</p>
-          <strong>{item.value}</strong>
-        </div>
-      ))}
+      <HeroMetricBoard />
     </div>
   </section>
 )
 
-const HomeFeaturePreview = ({ onNavigate }) => (
-  <section className="landing-section home-intelligence">
-    <div className="section-heading compact-heading">
-      <div>
-        <p className="section-kicker">Seller intelligence</p>
-        <h2>
-          The core seller workflows stay close together.
-        </h2>
-      </div>
-      <p>
-        Store health, catalog research, pricing checks, and MCP access share the
-        same account context instead of becoming separate admin work.
-      </p>
+const FeatureSection = () => (
+  <section className="landing-section feature-section">
+    <div className="section-heading">
+      <p className="plain-label">What sellers check</p>
+      <h2>Each page answers one operational question.</h2>
     </div>
-
-    <div className="home-feature-grid">
-      {features.map((feature) => {
+    <div className="feature-grid">
+      {featureGroups.map((feature) => {
         const Icon = feature.icon
         return (
           <article key={feature.title}>
-            <span><Icon size={22} /></span>
+            <Icon size={20} />
             <h3>{feature.title}</h3>
             <p>{feature.text}</p>
-            <button onClick={() => onNavigate('services')} aria-label={`Open ${feature.title}`}>
-              <ArrowUpRight size={17} />
-            </button>
           </article>
         )
       })}
@@ -422,22 +288,22 @@ const HomeFeaturePreview = ({ onNavigate }) => (
   </section>
 )
 
-const MarketVisualSection = () => (
-  <section className="market-visual-section">
-    <div className="market-visual-media">
-      <img src={landingImages.operations} alt="Ecommerce seller workspace with online order tools" />
+const OperationsSection = () => (
+  <section className="operations-section">
+    <div className="operations-image">
+      <img src={landingImages.operations} alt="Online seller reviewing ecommerce activity" />
     </div>
-    <div className="market-visual-copy">
-      <p className="section-kicker">Operational clarity</p>
-      <h2>Understand what is moving before the market moves past you.</h2>
+    <div className="operations-copy">
+      <p className="plain-label">Daily operating view</p>
+      <h2>Less hunting. More reviewing.</h2>
       <p>
-        daraziq.store brings store activity, competitor listings, product signals,
-        and pricing control into one seller workspace built for daily decisions.
+        The console separates store review, product comparison, pricing, and MCP setup
+        so the seller can focus on one decision at a time.
       </p>
-      <div className="market-signal-list">
-        <span><Check size={15} /> Product snapshots stay tied to seller context</span>
-        <span><Check size={15} /> Competitor data feeds product and price analysis</span>
-        <span><Check size={15} /> MCP tools inherit the same protected workspace</span>
+      <div className="signal-list">
+        <span><ShoppingBag size={16} /> Orders and revenue stay close to product context.</span>
+        <span><TrendingUp size={16} /> Competitor data is shown as ranges, not guesswork.</span>
+        <span><Bot size={16} /> AI summaries use the same visible seller data.</span>
       </div>
     </div>
   </section>
@@ -445,146 +311,20 @@ const MarketVisualSection = () => (
 
 const WorkflowSection = () => (
   <section className="workflow-section">
-    <div className="workflow-inner">
-      <div className="workflow-copy">
-        <p className="section-kicker">Operating flow</p>
-        <h2>From seller data to sharper action in three steps.</h2>
-        <p>
-          Start with authenticated seller data, compare it with the market, then
-          review AI-backed recommendations before changing anything important.
-        </p>
-      </div>
-
-      <div className="workflow-steps">
-        {workflowSteps.map((item) => {
-          const Icon = item.icon
-          return (
-            <article key={item.step} className="workflow-step">
-              <strong>{item.step}</strong>
-              <div>
-                <span><Icon size={20} /></span>
-                <h3>{item.title}</h3>
-                <p>{item.text}</p>
-              </div>
-            </article>
-          )
-        })}
-      </div>
+    <div className="section-heading">
+      <p className="plain-label">How the workspace works</p>
+      <h2>The product keeps action behind evidence.</h2>
     </div>
-  </section>
-)
-
-const DashboardPreview = () => {
-  const bars = [42, 64, 50, 78, 58, 86, 70, 94]
-
-  return (
-    <section className="dashboard-preview-section">
-      <div className="dashboard-preview-copy">
-        <p className="section-kicker">Command center</p>
-        <h2>A cleaner console for performance, products, and margin signals.</h2>
-        <p>
-          The dashboard groups daily store context, product checks, and pricing
-          guardrails into focused pages with direct navigation.
-        </p>
-      </div>
-
-      <div className="console-preview">
-        <div className="console-brand">
-          <img src={landingImages.dashboard} alt="Analytics dashboard displayed on a laptop" />
-        </div>
-        <div className="console-toolbar">
-          <span>Seller overview</span>
-          <i />
-        </div>
-        <div className="console-metrics">
-          <div>
-            <span>Orders</span>
-            <strong>1.2K</strong>
-          </div>
-          <div>
-            <span>Products</span>
-            <strong>342</strong>
-          </div>
-          <div>
-            <span>Sources</span>
-            <strong>3/3</strong>
-          </div>
-        </div>
-        <div className="console-bars" aria-hidden="true">
-          {bars.map((height, index) => (
-            <span key={index} style={{ height: `${height}%` }} />
-          ))}
-        </div>
-        <div className="console-insights">
-          <p><Check size={15} /> Competitor range detected</p>
-          <p><Check size={15} /> Margin guardrail healthy</p>
-          <p><Check size={15} /> AI brief ready</p>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-const McpHomeSection = ({ onGetStarted }) => (
-  <section className="mcp-home-section">
-    <div className="mcp-copy">
-      <p className="section-kicker">MCP access</p>
-      <h2>Let your AI client use the same seller tools.</h2>
-      <p>
-        Connect compatible MCP clients to daraziq.store and let agents inspect store
-        metrics, product context, competitor signals, and guarded pricing workflows.
-      </p>
-      <div className="mcp-stat-row">
-        {mcpStats.map((item) => (
-          <div key={item.label}>
-            <strong>{item.value}</strong>
-            <span>{item.label}</span>
-          </div>
-        ))}
-      </div>
-      <button onClick={onGetStarted}>Start MCP Setup <ArrowRight size={18} /></button>
-    </div>
-
-    <div className="mcp-terminal">
-      <div className="terminal-top" aria-hidden="true">
-        <span />
-        <span />
-        <span />
-      </div>
-      <div className="endpoint-row">
-        <span>Remote endpoint</span>
-        <code>api.daraziq.store/api/mcp</code>
-      </div>
-      <div className="mcp-command-list">
-        {mcpCommands.map((command) => (
-          <p key={command}>
-            <Check size={15} />
-            <code>{command}</code>
-          </p>
-        ))}
-      </div>
-      <div className="terminal-footer">
-        <Bot size={17} />
-        <span>OAuth protected agent workspace</span>
-      </div>
-    </div>
-  </section>
-)
-
-const TrustSection = () => (
-  <section className="trust-section">
-    <div className="section-title">
-      <h2>Control stays visible at every step.</h2>
-      <p>Security, source clarity, and guarded automation are part of the product flow.</p>
-    </div>
-    <div className="trust-grid">
-      {trustLayers.map((item) => {
-        const Icon = item.icon
+    <div className="workflow-list">
+      {workflowRows.map((row) => {
+        const Icon = row.icon
         return (
-          <article key={item.title}>
-            <span><Icon size={20} /></span>
-            <h3>{item.title}</h3>
-            <p>{item.text}</p>
+          <article key={row.title}>
+            <Icon size={20} />
+            <div>
+              <h3>{row.title}</h3>
+              <p>{row.text}</p>
+            </div>
           </article>
         )
       })}
@@ -592,16 +332,35 @@ const TrustSection = () => (
   </section>
 )
 
-const HomeFaqSection = () => (
-  <section className="faq-section home-faq-section">
-    <div className="outline-shape outline-left" aria-hidden="true" />
-    <div className="outline-shape outline-right" aria-hidden="true" />
-    <div className="section-title">
-      <h2>Frequently Asked<br />Questions</h2>
-      <p>Quick answers before sellers connect Daraz, AI providers, and MCP clients.</p>
+const TrustSection = () => (
+  <section className="trust-section">
+    <div className="section-heading">
+      <p className="plain-label">Why sellers can trust it</p>
+      <h2>Control is part of the interface.</h2>
+    </div>
+    <div className="trust-list">
+      {trustRows.map((row) => {
+        const Icon = row.icon
+        return (
+          <article key={row.title}>
+            <Icon size={19} />
+            <h3>{row.title}</h3>
+            <p>{row.text}</p>
+          </article>
+        )
+      })}
+    </div>
+  </section>
+)
+
+const FaqSection = () => (
+  <section className="faq-section">
+    <div className="section-heading">
+      <p className="plain-label">Questions</p>
+      <h2>Before you connect a store.</h2>
     </div>
     <div className="faq-list">
-      {faqs.slice(0, 4).map((item, index) => (
+      {faqs.map((item, index) => (
         <details key={item.question} open={index === 0}>
           <summary>
             <span>{item.question}</span>
@@ -617,26 +376,11 @@ const HomeFaqSection = () => (
 const FinalCta = ({ onGetStarted }) => (
   <section className="final-cta">
     <div>
-      <h2>Ready to Sell Smarter?</h2>
-      <p>
-        Bring your store, competitor data, pricing checks, and AI summaries into one clean workflow.
-      </p>
-      <button onClick={onGetStarted}>Get Started <ArrowRight size={18} /></button>
+      <p className="plain-label">Ready when the seller is</p>
+      <h2>Open the workspace and review today’s decision.</h2>
+      <button onClick={onGetStarted}>Open workspace</button>
     </div>
   </section>
-)
-
-const HomeLandingSections = ({ onNavigate, onGetStarted }) => (
-  <>
-    <HomeFeaturePreview onNavigate={onNavigate} />
-    <MarketVisualSection />
-    <WorkflowSection />
-    <DashboardPreview />
-    <McpHomeSection onGetStarted={onGetStarted} />
-    <TrustSection />
-    <HomeFaqSection />
-    <FinalCta onGetStarted={onGetStarted} />
-  </>
 )
 
 const SubpageHero = ({ page, onNavigate, onLogin }) => {
@@ -645,9 +389,9 @@ const SubpageHero = ({ page, onNavigate, onLogin }) => {
     <section className="subpage-hero">
       <SiteHeader page={page} onNavigate={onNavigate} onLogin={onLogin} />
       <div className="subpage-copy">
-        <p>{content.kicker}</p>
+        <p className="plain-label">{content.label}</p>
         <h1>{content.title}</h1>
-        <span>{content.text}</span>
+        <p>{content.text}</p>
       </div>
     </section>
   )
@@ -655,68 +399,10 @@ const SubpageHero = ({ page, onNavigate, onLogin }) => {
 
 const ServicesScreen = ({ onGetStarted }) => (
   <>
-    <section className="landing-section feature-section">
-      <div className="section-heading">
-        <div>
-          <h2>
-            Built for Sellers.<br />
-            Powered by <span>AI.</span>
-          </h2>
-          <p>
-            Connect your Daraz account once, then run store reviews, product checks, competitor searches,
-            and pricing workflows from one focused command center.
-          </p>
-        </div>
-        <div className="wire-mark" aria-hidden="true" />
-      </div>
-
-      <div className="feature-grid">
-        {features.map((feature, index) => {
-          const Icon = feature.icon
-          return (
-            <article key={feature.title} className={index === 2 ? 'wide-card' : ''}>
-              <p>{feature.text}</p>
-              <button aria-label={`${feature.title} details`}>
-                <ArrowUpRight size={18} />
-              </button>
-              <h3>{feature.title}</h3>
-              <Icon className="card-watermark" size={52} />
-            </article>
-          )
-        })}
-      </div>
-    </section>
-
-    <section className="proof-section">
-      <div className="proof-intro">
-        <span>2026</span>
-        <p>
-          Whether you manage a small catalog or a fast-growing store, daraziq.store helps you see
-          what changed, why it matters, and what to do next.
-        </p>
-      </div>
-
-      <div className="proof-grid">
-        {proofStats.map((item) => {
-          const Icon = item.icon
-          return (
-            <article key={item.title}>
-              <strong>{item.value}</strong>
-              <h3>{item.title}</h3>
-              <p>{item.detail}</p>
-              <div className="proof-line">
-                <span><Icon size={17} /></span>
-              </div>
-            </article>
-          )
-        })}
-      </div>
-
-      <div className="proof-cta">
-        <button onClick={onGetStarted}>Get Started <ArrowRight size={18} /></button>
-        <span>Seller intelligence is ready <i /></span>
-      </div>
-    </section>
+    <FeatureSection />
+    <WorkflowSection />
+    <TrustSection />
+    <FinalCta onGetStarted={onGetStarted} />
   </>
 )
 
@@ -724,35 +410,15 @@ const AboutScreen = () => (
   <>
     <section className="about-story">
       <div>
-        <p className="story-kicker">Why it exists</p>
-        <h2>Daraz sellers should not need five tools to answer one business question.</h2>
+        <p className="plain-label">Product point of view</p>
+        <h2>Daraz sellers do not need more noise. They need a reviewable next move.</h2>
       </div>
       <p>
-        The app keeps marketplace connection, store analytics, product comparison, competitor discovery,
-        pricing recommendations, AI briefs, and MCP access behind one account. The goal is simple:
-        less guessing, fewer unsafe pricing moves, and faster product decisions.
+        daraziq.store keeps marketplace connection, store analytics, product comparison,
+        competitor discovery, pricing recommendations, AI briefs, and MCP access behind one seller account.
       </p>
     </section>
-
-    <section className="faq-section">
-      <div className="outline-shape outline-left" aria-hidden="true" />
-      <div className="outline-shape outline-right" aria-hidden="true" />
-      <div className="section-title">
-        <h2>Frequently Asked<br />Questions</h2>
-        <p>Everything sellers usually ask before connecting Daraz, AI, and MCP workflows.</p>
-      </div>
-      <div className="faq-list">
-        {faqs.map((item, index) => (
-          <details key={item.question} open={index === 0}>
-            <summary>
-              <span>{item.question}</span>
-              <ChevronDown size={18} />
-            </summary>
-            <p>{item.answer}</p>
-          </details>
-        ))}
-      </div>
-    </section>
+    <FaqSection />
   </>
 )
 
@@ -764,7 +430,7 @@ const ContactScreen = ({ onGetStarted }) => (
           const Icon = item.icon
           return (
             <article key={item.title}>
-              <span><Icon size={22} /></span>
+              <Icon size={21} />
               <h2>{item.title}</h2>
               <p>{item.text}</p>
               <strong>{item.value}</strong>
@@ -773,39 +439,41 @@ const ContactScreen = ({ onGetStarted }) => (
         })}
       </div>
     </section>
-
     <FinalCta onGetStarted={onGetStarted} />
   </>
 )
 
-const LegalScreen = ({ page, onNavigate, onGetStarted }) => {
+const LegalScreen = ({ page, onGetStarted }) => {
   const content = legalContent[page]
   return (
     <>
       <section className="legal-section">
         <div className="legal-shell">
           <div className="legal-intro">
-            <p className="section-kicker">Updated {content.updated}</p>
-            <h2>{page === 'privacy' ? 'Privacy built for seller trust.' : 'Terms built for responsible seller operations.'}</h2>
-            <p>
-              daraziq.store keeps account access, marketplace data, AI workflows,
-              and connected-client activity governed by clear product rules.
-            </p>
+            <p className="plain-label">Updated {content.updated}</p>
+            <h2>{page === 'privacy' ? 'Privacy for connected seller data.' : 'Terms for seller decision support.'}</h2>
           </div>
           <div className="legal-list">
-            {content.sections.map((item) => (
-              <article key={item.title}>
-                <h3>{item.title}</h3>
-                <p>{item.text}</p>
+            {content.sections.map(([title, text]) => (
+              <article key={title}>
+                <h3>{title}</h3>
+                <p>{text}</p>
               </article>
             ))}
           </div>
         </div>
       </section>
-      <FinalCta onGetStarted={onGetStarted} onNavigate={onNavigate} />
+      <FinalCta onGetStarted={onGetStarted} />
     </>
   )
 }
+
+const FooterColumn = ({ title, children }) => (
+  <div>
+    <h3>{title}</h3>
+    <div className="footer-links">{children}</div>
+  </div>
+)
 
 function HomePage({ page = 'home', onNavigate, onLogin, onGetStarted }) {
   const normalizedPage = ['home', 'services', 'about', 'contact', 'privacy', 'terms'].includes(page) ? page : 'home'
@@ -818,49 +486,46 @@ function HomePage({ page = 'home', onNavigate, onLogin, onGetStarted }) {
         <SubpageHero page={normalizedPage} onNavigate={onNavigate} onLogin={onLogin} />
       )}
 
-      {normalizedPage === 'home' && <HomeLandingSections onNavigate={onNavigate} onGetStarted={onGetStarted} />}
+      {normalizedPage === 'home' && (
+        <>
+          <FeatureSection />
+          <OperationsSection />
+          <WorkflowSection />
+          <TrustSection />
+          <FaqSection />
+          <FinalCta onGetStarted={onGetStarted} />
+        </>
+      )}
       {normalizedPage === 'services' && <ServicesScreen onGetStarted={onGetStarted} />}
       {normalizedPage === 'about' && <AboutScreen />}
       {normalizedPage === 'contact' && <ContactScreen onGetStarted={onGetStarted} />}
       {['privacy', 'terms'].includes(normalizedPage) && (
-        <LegalScreen page={normalizedPage} onNavigate={onNavigate} onGetStarted={onGetStarted} />
+        <LegalScreen page={normalizedPage} onGetStarted={onGetStarted} />
       )}
 
       <footer className="landing-footer">
         <div className="footer-grid">
-          <FooterColumn title="About Us">
-            <p>
-              daraziq.store is a seller intelligence workspace for Daraz teams who want clearer metrics,
-              sharper product decisions, and safer pricing control.
-            </p>
+          <FooterColumn title="Product">
+            <p>daraziq.store is a Daraz seller workspace for store review, product comparison, pricing control, and MCP access.</p>
           </FooterColumn>
-          <FooterColumn title="Useful Links">
-            <button onClick={() => onNavigate('about')}>About</button>
+          <FooterColumn title="Pages">
             <button onClick={() => onNavigate('services')}>Services</button>
+            <button onClick={() => onNavigate('about')}>About</button>
+            <button onClick={() => onNavigate('contact')}>Contact</button>
+          </FooterColumn>
+          <FooterColumn title="Legal">
             <button onClick={() => onNavigate('privacy')}>Privacy Policy</button>
-            <button onClick={() => onNavigate('terms')}>Terms</button>
-            <button onClick={onGetStarted}>Get Started</button>
-            <button onClick={onLogin}>Login</button>
+            <button onClick={() => onNavigate('terms')}>Terms and Conditions</button>
           </FooterColumn>
-          <FooterColumn title="Help">
-            <button onClick={() => onNavigate('services')}>Store Analyst</button>
-            <button onClick={() => onNavigate('services')}>Product Lab</button>
-            <button onClick={() => onNavigate('services')}>MCP Access</button>
-            <button onClick={() => onNavigate('about')}>FAQ</button>
-          </FooterColumn>
-          <FooterColumn title="Connect With Us">
+          <FooterColumn title="Contact">
             <a href="mailto:support@daraziq.store">support@daraziq.store</a>
             <span>Daraz seller intelligence</span>
-            <span>Remote MCP ready</span>
+            <span>MCP-ready workspace</span>
           </FooterColumn>
         </div>
         <div className="footer-bottom">
-          <span>&copy; 2026 daraziq.store. All Rights Reserved.</span>
-          <div>
-            <Sparkles size={15} />
-            <TrendingUp size={15} />
-            <Check size={15} />
-          </div>
+          <span>© 2026 daraziq.store. All rights reserved.</span>
+          <span>Built for reviewable seller decisions.</span>
         </div>
       </footer>
     </main>

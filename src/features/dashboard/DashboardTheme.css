@@ -1,55 +1,48 @@
 .seller-console {
   min-height: 100vh;
-  background: var(--surface-page, #08090b) !important;
-  color: var(--text-primary, #ffffff) !important;
+  background: #f7f9f6 !important;
+  color: #1f2933 !important;
+  font-family: Inter, "Segoe UI", ui-sans-serif, system-ui, sans-serif;
 }
 
-.seller-console > div,
-.seller-console main {
-  position: relative;
-  z-index: 1;
-}
-
-.seller-console > aside {
-  z-index: 20;
+.seller-console aside,
+.seller-console header,
+.seller-console article,
+.seller-console section,
+.seller-console [class*="bg-white"] {
+  box-shadow: none !important;
 }
 
 .seller-console aside,
 .seller-console header {
-  background: var(--surface-alt, #0b0d10) !important;
-  border-color: var(--border-subtle, rgba(255, 255, 255, 0.1)) !important;
+  background: #ffffff !important;
+  border-color: #d9e1e8 !important;
 }
 
 .seller-console main {
-  max-width: var(--container-wide, 1200px) !important;
+  max-width: 1220px !important;
 }
 
-.seller-console footer {
-  color: var(--text-muted, rgba(255, 255, 255, 0.52)) !important;
+.seller-console [class*="uppercase"] {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
 }
 
 .seller-console article,
-.seller-console section,
-.seller-console table,
-.seller-console [class*="bg-white"] {
-  border-color: var(--border, rgba(255, 255, 255, 0.13)) !important;
-  background: var(--surface-panel, #121519) !important;
-  color: var(--text-primary, #ffffff) !important;
-  box-shadow: none !important;
+.seller-console section {
+  border-color: #d9e1e8 !important;
 }
 
-.seller-console [class*="border"] {
-  border-color: var(--border-subtle, rgba(255, 255, 255, 0.1)) !important;
+.seller-console [class*="rounded-full"] {
+  border-radius: 999px !important;
 }
 
-.seller-console [class*="rounded-2xl"],
-.seller-console [class*="rounded-xl"] {
-  border-radius: var(--radius-panel, 10px) !important;
+.seller-console [class*="rounded-lg"] {
+  border-radius: 14px !important;
 }
 
-.seller-console [class*="rounded-lg"],
 .seller-console [class*="rounded-md"] {
-  border-radius: var(--radius-md, 8px) !important;
+  border-radius: 7px !important;
 }
 
 .seller-console [class*="bg-[#f7f8fa]"],
@@ -60,19 +53,26 @@
 .seller-console [class*="bg-[#eef0f2]"],
 .seller-console [class*="bg-[#e5e7eb]"],
 .seller-console [class*="bg-[#e5e8eb]"] {
-  background: var(--surface-panel-muted, #171a1f) !important;
+  background: #eef3f0 !important;
 }
 
 .seller-console [class*="bg-[#fff1ea]"],
-.seller-console [class*="bg-[#fff0e8]"],
-.seller-console [class*="bg-[#fff8f6]"],
-.seller-console [class*="bg-[#fff6f3]"],
+.seller-console [class*="bg-[#fff0e8]"] {
+  background: #fff3eb !important;
+}
+
 .seller-console [class*="bg-[#eef6fb]"],
-.seller-console [class*="bg-[#edf5fb]"],
+.seller-console [class*="bg-[#edf5fb]"] {
+  background: #eaf3fb !important;
+}
+
 .seller-console [class*="bg-[#edf8f4]"],
-.seller-console [class*="bg-[#f2f0f8]"],
 .seller-console [class*="bg-[#f4fbf8]"] {
-  background: rgba(255, 84, 31, 0.1) !important;
+  background: #eaf7f3 !important;
+}
+
+.seller-console [class*="bg-[#f2f0f8]"] {
+  background: #f1eff8 !important;
 }
 
 .seller-console [class*="text-[#15181d]"],
@@ -83,7 +83,7 @@
 .seller-console [class*="text-[#303640]"],
 .seller-console [class*="text-[#344054]"],
 .seller-console [class*="text-[#3f4953]"] {
-  color: var(--text-primary, #ffffff) !important;
+  color: #1f2933 !important;
 }
 
 .seller-console [class*="text-[#667085]"],
@@ -98,99 +98,123 @@
 .seller-console [class*="text-[#8a939d]"],
 .seller-console [class*="text-[#8a939c]"],
 .seller-console [class*="text-[#98a0a9]"] {
-  color: var(--text-secondary, rgba(255, 255, 255, 0.66)) !important;
+  color: #65707c !important;
 }
 
 .seller-console [class*="text-[#d94c06]"],
 .seller-console [class*="text-[#e34d03]"],
-.seller-console [class*="text-[#a33a22]"],
+.seller-console [class*="text-[#a33a22]"] {
+  color: #c94702 !important;
+}
+
 .seller-console [class*="text-[#2e6f9e]"],
+.seller-console [class*="text-[#3477a6]"] {
+  color: #2166a5 !important;
+}
+
 .seller-console [class*="text-[#236b55]"],
 .seller-console [class*="text-[#26735b]"],
 .seller-console [class*="text-[#27745d]"],
 .seller-console [class*="text-[#2b8469]"] {
-  color: var(--brand, #ff541f) !important;
+  color: #1f8a70 !important;
 }
 
-.seller-console nav button {
-  color: var(--text-secondary, rgba(255, 255, 255, 0.66)) !important;
-}
-
-.seller-console nav button:hover {
-  background: var(--surface-hover, rgba(255, 255, 255, 0.06)) !important;
-  color: var(--text-primary, #ffffff) !important;
-}
-
-.seller-console nav button[class*="bg-[#20252c]"] {
-  background: var(--brand, #ff541f) !important;
-  color: #ffffff !important;
-}
-
+.seller-console nav button[class*="bg-[#20252c]"],
 .seller-console button[class*="bg-[#20252c]"],
 .seller-console button[class*="bg-[#f85606]"],
 .seller-console a[class*="bg-[#d94c06]"] {
-  background: var(--brand, #ff541f) !important;
+  background: #1f2933 !important;
   color: #ffffff !important;
 }
 
-.seller-console button[class*="bg-[#20252c]"]:hover,
-.seller-console button[class*="bg-[#f85606]"]:hover,
-.seller-console a[class*="bg-[#d94c06]"]:hover {
-  background: var(--brand-hover, #e84916) !important;
+.seller-console nav button:not([class*="bg-[#20252c]"]):hover,
+.seller-console button[class*="border"]:hover,
+.seller-console a[class*="border"]:hover {
+  background: #eef3f0 !important;
 }
 
-.seller-console button[class*="border"],
-.seller-console a[class*="border"],
 .seller-console input,
 .seller-console select,
 .seller-console textarea,
 .seller-console code {
-  border-color: var(--border, rgba(255, 255, 255, 0.13)) !important;
-  background: var(--surface-panel-muted, #171a1f) !important;
-  color: var(--text-primary, #ffffff) !important;
-  box-shadow: none !important;
-}
-
-.seller-console button[class*="border"]:hover,
-.seller-console a[class*="border"]:hover,
-.seller-console input:hover,
-.seller-console select:hover,
-.seller-console textarea:hover {
-  border-color: rgba(255, 255, 255, 0.24) !important;
+  border-color: #c6d2dd !important;
+  background: #ffffff !important;
+  color: #1f2933 !important;
 }
 
 .seller-console input:focus,
 .seller-console select:focus,
 .seller-console textarea:focus {
-  border-color: rgba(255, 84, 31, 0.65) !important;
+  border-color: #2166a5 !important;
   outline: none !important;
+  box-shadow: 0 0 0 3px rgba(33, 102, 165, 0.12) !important;
 }
 
-.seller-console input::placeholder,
-.seller-console textarea::placeholder {
-  color: rgba(255, 255, 255, 0.42) !important;
+.seller-console article,
+.seller-console section,
+.seller-console tr {
+  transition: none !important;
 }
 
-.seller-console thead {
-  background: var(--surface-panel-muted, #171a1f) !important;
-}
-
-.seller-console tr,
-.seller-console tbody,
-.seller-console td,
-.seller-console th,
-.seller-console [class*="divide-y"] > :not([hidden]) ~ :not([hidden]) {
-  border-color: var(--border-subtle, rgba(255, 255, 255, 0.1)) !important;
-}
-
-.seller-console tr:hover {
-  background: var(--surface-hover, rgba(255, 255, 255, 0.06)) !important;
-}
-
-.seller-console img {
-  border-color: var(--border-subtle, rgba(255, 255, 255, 0.1)) !important;
+.seller-console button,
+.seller-console a,
+.seller-console input,
+.seller-console select {
+  transition-duration: 120ms !important;
 }
 
 .seller-console svg {
-  stroke-width: 1.9;
+  stroke-width: 1.85;
+}
+
+.dashboard-hero-panel {
+  border: 1px solid #c6d2dd;
+  background: #ffffff;
+}
+
+.dashboard-hero-panel strong,
+.dashboard-figure,
+.analytics-figure {
+  font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, ui-monospace, monospace;
+}
+
+.analytics-line path {
+  fill: none;
+  stroke: #2166a5;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.analytics-line .area {
+  fill: rgba(33, 102, 165, 0.1);
+  stroke: none;
+}
+
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.heatmap-cell {
+  aspect-ratio: 1;
+  border-radius: 5px;
+  background: #e3e9ee;
+}
+
+.heatmap-cell[data-level="1"] {
+  background: #cfe5dc;
+}
+
+.heatmap-cell[data-level="2"] {
+  background: #99cdbc;
+}
+
+.heatmap-cell[data-level="3"] {
+  background: #57a88d;
+}
+
+.heatmap-cell[data-level="4"] {
+  background: #1f8a70;
 }
