@@ -1,181 +1,51 @@
-import { useEffect, useMemo, useState } from 'react'
-import {
-  Bot,
-  CheckCircle2,
-  CircleAlert,
-  KeyRound,
-  Loader2,
-  LockKeyhole,
-  Route,
-  Save,
-  Sparkles,
-  Trash2,
-} from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { LockKeyhole, RefreshCw, Save, Trash2, Undo2 } from 'lucide-react'
 import { settingsApi } from '../../shared/api'
+import {
+  Button,
+  ConfirmDialog,
+  Feedback,
+  Field,
+  PageHeader,
+  Select,
+  Skeleton,
+  StatusBadge,
+} from '../../shared/ui'
 
-const providers = [
-  {
-    id: 'openrouter',
-    label: 'OpenRouter',
-    detail: 'Free router and multi-model catalog',
-    icon: Route,
-    accent: 'border-[#c6ddea] bg-[#eef6fb] text-[#2e6f9e]',
-  },
-  {
-    id: 'openai',
-    label: 'OpenAI GPT',
-    detail: 'Direct GPT model calls',
-    icon: Bot,
-    accent: 'border-[#b9dfd2] bg-[#edf8f4] text-[#236b55]',
-  },
-]
-
-const sampleSettings = {
+const initialForm = {
   activeProvider: 'openrouter',
-  defaults: {
-    openaiModel: 'gpt-5.6-terra',
-    openrouterModel: 'openrouter/free',
-  },
-  providers: {
-    openrouter: {
-      ready: true,
-      hasUserKey: false,
-      hasPlatformKey: true,
-      model: 'openrouter/free',
-    },
-    openai: {
-      ready: false,
-      hasUserKey: false,
-      hasPlatformKey: false,
-      model: 'gpt-5.6-terra',
-    },
-  },
+  openaiModel: '',
+  openrouterModel: '',
+  openaiApiKey: '',
+  openrouterApiKey: '',
+  clearOpenaiKey: false,
+  clearOpenrouterKey: false,
 }
+const formFromSettings = (result) => ({
+  ...initialForm,
+  activeProvider: result.activeProvider,
+  openaiModel: result.providers.openai.model,
+  openrouterModel: result.providers.openrouter.model,
+})
 
-const Field = ({ label, ...props }) => (
-  <label className="block min-w-0">
-    <span className="mb-2 block text-xs font-semibold text-[#858e97]">{label}</span>
-    <input
-      className="h-10 w-full rounded-md border border-[#d8dde3] bg-white px-3 text-sm text-[#15181d] transition placeholder:text-[#98a2b3] focus:border-[#9aa4b2] focus:outline-none focus:ring-2 focus:ring-[#edf0f3]"
-      {...props}
-    />
-  </label>
-)
-
-const StatusPill = ({ ready, hasUserKey, hasPlatformKey }) => {
-  const text = ready
-    ? hasUserKey
-      ? 'User key'
-      : hasPlatformKey
-        ? 'Platform key'
-        : 'Ready'
-    : 'Needs key'
-  return (
-    <span className={`inline-flex w-fit items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${
-      ready ? 'bg-[#edf8f4] text-[#26735b]' : 'bg-[#fff6f3] text-[#a33a22]'
-    }`}>
-      <span className={`h-1.5 w-1.5 rounded-full ${ready ? 'bg-[#35a17e]' : 'bg-[#d94c06]'}`} />
-      {text}
-    </span>
-  )
-}
-
-const ProviderButton = ({ provider, active, onClick }) => {
-  const Icon = provider.icon
-  return (
-    <button
-      onClick={onClick}
-      className={`min-w-0 cursor-pointer rounded-lg border p-4 text-left transition ${
-        active ? provider.accent : 'border-[#e5e7eb] bg-white text-[#46525d] hover:border-[#d8dde3] hover:bg-[#fafbfc]'
-      }`}
-    >
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold">{provider.label}</p>
-          <p className="mt-1 truncate text-xs opacity-80">{provider.detail}</p>
-        </div>
-        <Icon size={18} />
-      </div>
-    </button>
-  )
-}
-
-const ProviderPanel = ({
-  title,
-  description,
-  model,
-  modelPlaceholder,
-  apiKey,
-  keyPlaceholder,
-  status,
-  clear,
-  onModel,
-  onKey,
-  onClear,
-}) => (
-  <section className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white">
-    <div className="flex flex-col justify-between gap-3 border-b border-[#eef0f2] px-5 py-4 sm:flex-row sm:items-center">
-      <div className="min-w-0">
-        <h2 className="text-base font-semibold text-[#15181d]">{title}</h2>
-        <p className="mt-1 truncate text-xs text-[#667085]">{description}</p>
-      </div>
-      <StatusPill {...status} />
-    </div>
-    <div className="grid gap-4 px-5 py-5 md:grid-cols-2">
-      <Field label="Model" value={model} onChange={onModel} placeholder={modelPlaceholder} />
-      <div>
-        <Field label="API key" type="password" value={apiKey} onChange={onKey} placeholder={keyPlaceholder} autoComplete="off" />
-        {(status?.hasUserKey || status?.hasPlatformKey) && !apiKey && (
-          <p className="mt-2 text-xs font-medium text-[#667085]">
-            Saved key: <span className="font-mono">************</span> {status?.hasUserKey ? '(user key)' : '(platform key)'}
-          </p>
-        )}
-      </div>
-    </div>
-    <div className="flex flex-col justify-between gap-3 border-t border-[#eef0f2] px-5 py-4 sm:flex-row sm:items-center">
-      <div className="flex items-center gap-2 text-xs text-[#667085]">
-        <LockKeyhole size={14} /> Keys are encrypted at rest.
-      </div>
-      <button
-        onClick={onClear}
-        className={`inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md border px-3 text-sm font-medium transition ${
-          clear ? 'border-[#f2c6bc] bg-[#fff8f6] text-[#a33a22]' : 'border-[#d8dde3] text-[#344054] hover:bg-[#f8fafc]'
-        }`}
-      >
-        <Trash2 size={15} /> {clear ? 'Will clear' : 'Clear saved key'}
-      </button>
-    </div>
-  </section>
-)
-
-function Settings({ user }) {
+export default function Settings() {
   const [settings, setSettings] = useState(null)
-  const [form, setForm] = useState({
-    activeProvider: 'openrouter',
-    openaiModel: 'gpt-5.6-terra',
-    openrouterModel: 'openrouter/free',
-    openaiApiKey: '',
-    openrouterApiKey: '',
-    clearOpenaiKey: false,
-    clearOpenrouterKey: false,
-  })
+  const [form, setForm] = useState(initialForm)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [notice, setNotice] = useState('')
   const [error, setError] = useState('')
+  const [notice, setNotice] = useState('')
+  const [clearProvider, setClearProvider] = useState(null)
 
   useEffect(() => {
     let active = true
-    settingsApi.ai()
+    settingsApi
+      .ai()
       .then(({ settings: result }) => {
-        if (!active) return
-        setSettings(result)
-        setForm((current) => ({
-          ...current,
-          activeProvider: result.activeProvider,
-          openaiModel: result.providers.openai.model,
-          openrouterModel: result.providers.openrouter.model,
-        }))
+        if (active) {
+          setSettings(result)
+          setForm(formFromSettings(result))
+        }
       })
       .catch((requestError) => {
         if (active) setError(requestError.message)
@@ -183,41 +53,56 @@ function Settings({ user }) {
       .finally(() => {
         if (active) setLoading(false)
       })
-    return () => { active = false }
+    return () => {
+      active = false
+    }
   }, [])
 
-  const activeProvider = useMemo(
-    () => providers.find((provider) => provider.id === form.activeProvider) || providers[0],
-    [form.activeProvider],
-  )
-  const displaySettings = settings || sampleSettings
-
+  const retry = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const { settings: result } = await settingsApi.ai()
+      setSettings(result)
+      setForm(formFromSettings(result))
+    } catch (requestError) {
+      setError(requestError.message)
+    } finally {
+      setLoading(false)
+    }
+  }
   const update = (field) => (event) => {
     setForm((current) => ({ ...current, [field]: event.target.value }))
+    setNotice('')
   }
+  const provider = form.activeProvider
+  const providerLabel = provider === 'openai' ? 'OpenAI' : 'OpenRouter'
+  const state = settings?.providers?.[provider]
+  const modelField = `${provider}Model`
+  const keyField = `${provider}ApiKey`
+  const clearField =
+    provider === 'openai' ? 'clearOpenaiKey' : 'clearOpenrouterKey'
+  const clearing = form[clearField]
+  const keyStatus = !state
+    ? 'Status unavailable'
+    : clearing
+      ? 'Removal pending'
+      : state.hasUserKey
+        ? 'Personal key saved securely'
+        : state.hasPlatformKey
+          ? 'Using platform credentials'
+          : 'Missing configuration'
 
-  const toggleClear = (field) => () => {
-    setForm((current) => ({ ...current, [field]: !current[field] }))
-  }
-
-  const save = async () => {
+  const save = async (event) => {
+    event.preventDefault()
     setSaving(true)
     setError('')
     setNotice('')
     try {
       const { settings: result } = await settingsApi.updateAi(form)
       setSettings(result)
-      setForm((current) => ({
-        ...current,
-        activeProvider: result.activeProvider,
-        openaiModel: result.providers.openai.model,
-        openrouterModel: result.providers.openrouter.model,
-        openaiApiKey: '',
-        openrouterApiKey: '',
-        clearOpenaiKey: false,
-        clearOpenrouterKey: false,
-      }))
-      setNotice('AI provider settings saved.')
+      setForm(formFromSettings(result))
+      setNotice('AI settings saved securely.')
     } catch (requestError) {
       setError(requestError.message)
     } finally {
@@ -225,110 +110,169 @@ function Settings({ user }) {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="grid min-h-[420px] place-items-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d8dde3] border-t-[#20252c]" />
-      </div>
-    )
-  }
-
   return (
-    <div>
-      <div className="flex flex-col justify-between gap-4 border-b border-[#e5e7eb] pb-5 sm:flex-row sm:items-end">
-        <div>
-          <p className="text-xs font-medium text-[#8a94a3]">Settings</p>
-          <h1 className="mt-2 text-2xl font-semibold text-[#15181d]">AI provider</h1>
-          <p className="mt-1.5 text-sm text-[#667085]">Choose the model route used by Copilot briefs for {user.name}.</p>
+    <>
+      <PageHeader
+        title="Settings"
+        description="Choose the AI provider and model used for your briefs."
+      />
+      <Feedback error={error} onDismiss={() => setError('')} />
+      {loading ? (
+        <Skeleton label="Loading AI settings" />
+      ) : !settings ? (
+        <div className="empty-state">
+          <h3>Settings could not be loaded</h3>
+          <p>Try again to see your saved provider configuration.</p>
+          <Button icon={RefreshCw} onClick={retry}>
+            Retry
+          </Button>
         </div>
-        <button
-          onClick={save}
-          disabled={saving}
-          className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md bg-[#20252c] px-4 text-sm font-semibold text-white transition hover:bg-[#111827] disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />} Save settings
-        </button>
-      </div>
-
-      {(notice || error) && (
-        <div className={`mt-5 flex items-start gap-3 rounded-lg border px-4 py-3 text-sm ${error ? 'border-[#f2c6bc] bg-[#fff8f6] text-[#983720]' : 'border-[#b9dfd2] bg-[#f4fbf8] text-[#236b55]'}`}>
-          {error ? <CircleAlert size={17} className="mt-0.5 shrink-0" /> : <CheckCircle2 size={17} className="mt-0.5 shrink-0" />}
-          <span className="flex-1">{error || notice}</span>
+      ) : (
+        <div className="settings-layout">
+          <form className="settings-form form-stack" onSubmit={save}>
+            <h2 className="settings-section-title">AI provider</h2>
+            <fieldset className="form-stack" disabled={saving}>
+              <Select
+                label="Provider"
+                value={provider}
+                onChange={update('activeProvider')}
+              >
+                <option value="openrouter">OpenRouter</option>
+                <option value="openai">OpenAI</option>
+              </Select>
+              <Field
+                label="Model"
+                value={form[modelField]}
+                onChange={update(modelField)}
+                placeholder={
+                  settings.defaults?.[modelField] || 'Model identifier'
+                }
+                list={`${provider}-models`}
+                maxLength={160}
+                hint="Use a model identifier supported by your selected provider."
+                required
+              />
+              <datalist id={`${provider}-models`}>
+                {[...new Set([state?.model, settings.defaults?.[modelField]])]
+                  .filter(Boolean)
+                  .map((model) => (
+                    <option key={model} value={model} />
+                  ))}
+              </datalist>
+              <div className="settings-key-state">
+                <div>
+                  <StatusBadge
+                    tone={
+                      clearing
+                        ? 'warning'
+                        : state?.ready
+                          ? 'success'
+                          : 'warning'
+                    }
+                  >
+                    {keyStatus}
+                  </StatusBadge>
+                  <p>
+                    {clearing
+                      ? 'The personal key will be removed when you save.'
+                      : state?.hasUserKey
+                        ? 'The stored key is never returned to this browser.'
+                        : state?.hasPlatformKey
+                          ? 'Your briefs use the platform key unless you add a personal key.'
+                          : 'Add a personal key to enable this provider.'}
+                  </p>
+                </div>
+                {state?.hasUserKey && (
+                  <Button
+                    variant="ghost"
+                    icon={clearing ? Undo2 : Trash2}
+                    onClick={() =>
+                      clearing
+                        ? setForm((current) => ({
+                            ...current,
+                            [clearField]: false,
+                          }))
+                        : setClearProvider(provider)
+                    }
+                  >
+                    {clearing ? 'Undo removal' : 'Remove key'}
+                  </Button>
+                )}
+              </div>
+              <Field
+                label={
+                  state?.hasUserKey
+                    ? 'Replace personal API key'
+                    : 'Personal API key (optional)'
+                }
+                type="password"
+                name={keyField}
+                value={form[keyField]}
+                onChange={(event) => {
+                  update(keyField)(event)
+                  if (event.target.value)
+                    setForm((current) => ({ ...current, [clearField]: false }))
+                }}
+                placeholder="Enter a new key"
+                autoComplete="off"
+                spellCheck={false}
+                hint="Leave blank to keep your current credentials."
+              />
+            </fieldset>
+            <div className="settings-form-footer">
+              <Button type="submit" icon={Save} loading={saving}>
+                Save settings
+              </Button>
+              <span className="muted">
+                {providerLabel} / {form[modelField]}
+              </span>
+            </div>
+          </form>
+          <aside className="settings-security">
+            <LockKeyhole size={22} />
+            <h2>Your keys stay private</h2>
+            <p>
+              Personal API keys are encrypted at rest and used only by the
+              server to request your AI briefs.
+            </p>
+            <p>
+              The workspace displays whether a key is configured, never the
+              saved key itself.
+            </p>
+            <p>
+              Your selected provider receives the store or product information
+              needed for the brief.
+            </p>
+          </aside>
         </div>
       )}
-
-      <section className="mt-6 overflow-hidden rounded-lg border border-[#e5e7eb] bg-white">
-        <div className="border-b border-[#eef0f2] px-5 py-4">
-          <h2 className="text-base font-semibold text-[#15181d]">Active provider</h2>
-          <p className="mt-1 text-xs text-[#667085]">{activeProvider.label}</p>
-        </div>
-        <div className="grid gap-3 px-5 py-5 md:grid-cols-2">
-          {providers.map((provider) => (
-            <ProviderButton
-              key={provider.id}
-              provider={provider}
-              active={form.activeProvider === provider.id}
-              onClick={() => setForm((current) => ({ ...current, activeProvider: provider.id }))}
-            />
-          ))}
-        </div>
-      </section>
-
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
-        <ProviderPanel
-          title="OpenRouter"
-          description="Default route for low-cost AI briefs"
-          model={form.openrouterModel}
-          modelPlaceholder={displaySettings?.defaults?.openrouterModel || 'openrouter/free'}
-          apiKey={form.openrouterApiKey}
-          keyPlaceholder={displaySettings?.providers.openrouter.hasUserKey ? 'Saved key active' : 'Platform or user key'}
-          status={displaySettings?.providers.openrouter || {}}
-          clear={form.clearOpenrouterKey}
-          onModel={update('openrouterModel')}
-          onKey={update('openrouterApiKey')}
-          onClear={toggleClear('clearOpenrouterKey')}
-        />
-
-        <ProviderPanel
-          title="OpenAI GPT"
-          description="Direct OpenAI Responses API route"
-          model={form.openaiModel}
-          modelPlaceholder={displaySettings?.defaults?.openaiModel || 'gpt-5.6-terra'}
-          apiKey={form.openaiApiKey}
-          keyPlaceholder={displaySettings?.providers.openai.hasUserKey ? 'Saved key active' : 'Platform or user key'}
-          status={displaySettings?.providers.openai || {}}
-          clear={form.clearOpenaiKey}
-          onModel={update('openaiModel')}
-          onKey={update('openaiApiKey')}
-          onClear={toggleClear('clearOpenaiKey')}
-        />
-      </div>
-
-      <section className="mt-6 grid overflow-hidden rounded-lg border border-[#e5e7eb] bg-[#eef0f2] sm:grid-cols-3">
-        <div className="bg-white px-5 py-5">
-          <div className="flex items-center gap-2 text-xs font-medium text-[#8a94a3]">
-            <Sparkles size={14} /> Active
-          </div>
-          <p className="mt-2 truncate text-xl font-semibold text-[#15181d]">{activeProvider.label}</p>
-          <p className="mt-1 truncate text-xs text-[#667085]">Used by Copilot AI brief</p>
-        </div>
-        <div className="bg-white px-5 py-5">
-          <div className="flex items-center gap-2 text-xs font-medium text-[#8a94a3]">
-            <KeyRound size={14} /> OpenRouter
-          </div>
-          <p className="mt-2 truncate text-xl font-semibold text-[#15181d]">{displaySettings?.providers.openrouter.ready ? 'Ready' : 'Needs key'}</p>
-          <p className="mt-1 truncate text-xs text-[#667085]">{displaySettings?.providers.openrouter.model}</p>
-        </div>
-        <div className="bg-white px-5 py-5">
-          <div className="flex items-center gap-2 text-xs font-medium text-[#8a94a3]">
-            <Bot size={14} /> OpenAI GPT
-          </div>
-          <p className="mt-2 truncate text-xl font-semibold text-[#15181d]">{displaySettings?.providers.openai.ready ? 'Ready' : 'Needs key'}</p>
-          <p className="mt-1 truncate text-xs text-[#667085]">{displaySettings?.providers.openai.model}</p>
-        </div>
-      </section>
-    </div>
+      <ConfirmDialog
+        open={Boolean(clearProvider)}
+        onClose={() => setClearProvider(null)}
+        title="Remove the saved personal key?"
+        confirmLabel="Mark for removal"
+        danger
+        onConfirm={() => {
+          const field =
+            clearProvider === 'openai' ? 'clearOpenaiKey' : 'clearOpenrouterKey'
+          setForm((current) => ({
+            ...current,
+            [field]: true,
+            [`${clearProvider}ApiKey`]: '',
+          }))
+          setClearProvider(null)
+        }}
+      >
+        The key will be removed when you save settings.{' '}
+        {settings?.providers?.[clearProvider]?.hasPlatformKey
+          ? 'This provider will then use platform credentials.'
+          : 'This provider will need a new key before generating briefs.'}
+      </ConfirmDialog>
+      {notice && (
+        <Feedback toast onDismiss={() => setNotice('')}>
+          {notice}
+        </Feedback>
+      )}
+    </>
   )
 }
-
-export default Settings

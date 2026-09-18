@@ -21,7 +21,7 @@ export const clearSession = () => {
   localStorage.removeItem(USER_KEY)
 }
 
-const request = async (path, { method = 'GET', body, authenticated = false } = {}) => {
+const request = async (path, { method = 'GET', body, authenticated = false, baseUrl = API_URL } = {}) => {
   const headers = { Accept: 'application/json' }
   if (body) headers['Content-Type'] = 'application/json'
   if (authenticated && getSessionToken()) {
@@ -30,7 +30,7 @@ const request = async (path, { method = 'GET', body, authenticated = false } = {
 
   let response
   try {
-    response = await fetch(`${API_URL}${path}`, {
+    response = await fetch(`${baseUrl}${path}`, {
       method,
       headers,
       body: body ? JSON.stringify(body) : undefined,
@@ -85,4 +85,8 @@ export const copilotApi = {
 export const settingsApi = {
   ai: () => request('/settings/ai', { authenticated: true }),
   updateAi: (values) => request('/settings/ai', { method: 'PUT', body: values, authenticated: true }),
+}
+
+export const contactApi = {
+  send: (values) => request('/contact', { method: 'POST', body: values, baseUrl: import.meta.env.VITE_CONTACT_API_URL || API_URL }),
 }

@@ -1,39 +1,57 @@
 import { useCallback, useEffect, useState } from 'react'
 import {
+  ArrowRight,
   BarChart3,
-  CheckCircle2,
-  CircleAlert,
+  ChevronDown,
+  CircleHelp,
   Gauge,
   LayoutDashboard,
   LogOut,
+  Menu,
   Package,
-  PieChart,
   PlugZap,
   RefreshCw,
-  Search,
-  Server,
   Settings,
-  ShieldCheck,
-  ShoppingBag,
-  Trophy,
-  TrendingUp,
   Unplug,
-  X,
 } from 'lucide-react'
 import { darazApi } from '../../shared/api'
+import { demoStatus } from '../../shared/demo'
+import {
+  formatCurrency,
+  formatDate,
+  formatNumber,
+  numeric,
+} from '../../shared/format'
+import {
+  Brand,
+  Button,
+  ConfirmDialog,
+  DemoIndicator,
+  Dialog,
+  Disclosure,
+  EmptyState,
+  Feedback,
+  IconButton,
+  Kpi,
+  PageHeader,
+  PriorityRow,
+  Skeleton,
+  StatusBadge,
+  Tabs,
+} from '../../shared/ui'
+import { OrderTrend, StatusDistribution } from '../../shared/charts'
 import Copilot from '../copilot/Copilot'
 import SettingsPanel from '../settings/Settings'
 import './DashboardTheme.css'
 
 const navItems = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-  { id: 'store', label: 'Store Analyst', icon: BarChart3 },
-  { id: 'product', label: 'Product Lab', icon: Search },
-  { id: 'pricing', label: 'Pricing Control', icon: Gauge },
-  { id: 'mcp', label: 'MCP Access', icon: Server },
+  { id: 'product', label: 'Products', icon: Package },
+  { id: 'store', label: 'Store Insights', icon: BarChart3 },
+  { id: 'pricing', label: 'Pricing', icon: Gauge },
+  { id: 'mcp', label: 'Integrations', icon: PlugZap },
   { id: 'settings', label: 'Settings', icon: Settings },
 ]
-
 const dashboardPaths = {
   overview: '/dashboard',
   store: '/dashboard/store',
@@ -42,238 +60,281 @@ const dashboardPaths = {
   mcp: '/dashboard/mcp',
   settings: '/dashboard/settings',
 }
+const readDashboardView = () =>
+  Object.entries(dashboardPaths).find(
+    ([, path]) => window.location.pathname.replace(/\/$/, '') === path,
+  )?.[0] || 'overview'
 
-const readDashboardView = () => {
-  const match = Object.entries(dashboardPaths).find(([, path]) => window.location.pathname === path)
-  return match?.[0] || 'overview'
-}
-
-const formatDate = (value, withTime = false) => {
-  if (!value) return 'Not available'
-  return new Intl.DateTimeFormat('en', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    ...(withTime ? { hour: '2-digit', minute: '2-digit' } : {}),
-  }).format(new Date(value))
-}
-
-const formatNumber = (value) => {
-  const number = Number(value)
-  if (!Number.isFinite(number)) return '-'
-  return new Intl.NumberFormat('en').format(number)
-}
-
-const formatCurrency = (value) => {
-  const number = Number(value)
-  if (!Number.isFinite(number)) return '-'
-  return new Intl.NumberFormat('en-PK', {
-    style: 'currency',
-    currency: 'PKR',
-    maximumFractionDigits: 0,
-  }).format(number)
-}
-
-const demoDailyOrders = [
-  18, 22, 19, 24, 21, 28, 33, 25, 29, 31,
-  27, 36, 34, 38, 41, 37, 44, 39, 42, 47,
-  43, 50, 46, 54, 58, 53, 61, 57, 65, 68,
-].map((orders, index) => {
-  const date = new Date('2026-09-08T00:00:00.000Z')
-  date.setDate(date.getDate() - (29 - index))
-  return { date: date.toISOString().slice(0, 10), orders }
-})
-
-const demoStatus = {
-  connected: true,
-  connection: {
-    sellerId: 'PK-DIQ-784219',
-    sellerName: 'Urban Cart Studio',
-    country: 'Pakistan',
-    accountPlatform: 'daraz_pk',
-    connectedAt: '2026-06-08T10:30:00.000Z',
-  },
-  stats: {
-    ordersLast30Days: 1190,
-    products: 8,
-    synced: 3,
-    totalSources: 3,
-    lastSyncedAt: '2026-09-08T16:28:00.000Z',
-    revenue: 5254000,
-    charts: {
-      dailyOrders: demoDailyOrders,
-      statusBreakdown: [
-        { status: 'delivered', count: 904 },
-        { status: 'shipped', count: 155 },
-        { status: 'pending', count: 89 },
-        { status: 'returned', count: 29 },
-        { status: 'cancelled', count: 13 },
-      ],
-      topProducts: [
-        { title: 'AuroraSound X7 Wireless Earbuds with ANC', sku: 'AUR-EB-X7-BLK', orders: 286, units: 329 },
-        { title: 'GlowNest Vitamin C Serum 30ml', sku: 'GLOW-SERUM-C', orders: 238, units: 281 },
-        { title: 'UrbanCarry 18L Laptop Backpack', sku: 'URBAN-BP-18L', orders: 194, units: 211 },
-        { title: 'NovaFit S2 Bluetooth Calling Smart Watch', sku: 'NOVA-FIT-S2-GRY', orders: 151, units: 169 },
-      ],
-    },
-  },
-}
-
-const BrandMark = ({ compact = false }) => (
-  <div className="flex min-w-0 items-center gap-3">
-    <span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-lg border border-[#e5e7eb] bg-white">
-      <img src="/favicon.svg" alt="" className="h-full w-full object-cover object-center" />
-    </span>
-    {!compact && (
-      <div className="min-w-0">
-        <span className="block truncate text-sm font-semibold text-[#15181d]">daraziq.store</span>
-        <span className="block truncate text-xs text-[#7b8491]">Seller workspace</span>
-      </div>
-    )}
-  </div>
-)
-
-const Metric = ({ icon: Icon, label, value, detail, description, tone }) => (
-  <article className="min-w-0 rounded-lg border border-[#e5e7eb] bg-white p-4">
-    <div className="flex items-start justify-between gap-4">
-      <div className="min-w-0">
-        <p className="text-xs font-medium text-[#8a94a3]">{label}</p>
-        <p className="mt-3 truncate text-2xl font-semibold text-[#15181d]">{value ?? '-'}</p>
-        <p className="mt-1 truncate text-xs text-[#667085]">{detail}</p>
-        {description && <p className="sr-only">{description}</p>}
-      </div>
-      <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${tone || 'bg-[#f5f6f8] text-[#667085]'}`}>
-        <Icon size={18} />
-      </span>
-    </div>
-  </article>
-)
-
-const EmptyState = ({ children }) => (
-  <div className="grid min-h-[160px] place-items-center rounded-lg border border-dashed border-[#d8dde3] bg-[#fafbfc] px-5 text-center text-sm text-[#667085]">
-    {children}
-  </div>
-)
-
-const MiniBars = ({ items = [], valueKey = 'orders' }) => {
-  const max = Math.max(1, ...items.map((item) => Number(item[valueKey]) || 0))
-  if (!items.some((item) => Number(item[valueKey]) > 0)) return <EmptyState>No order activity in this range yet.</EmptyState>
+function Overview({
+  stats,
+  demo,
+  connected,
+  connect,
+  working,
+  loading,
+  refresh,
+  onNavigate,
+}) {
+  const [chartTab, setChartTab] = useState('trend')
+  const [barView, setBarView] = useState(false)
+  const pending = stats?.charts?.statusBreakdown?.find(
+    (entry) => entry.status === 'pending',
+  )?.count
+  const returned = stats?.charts?.statusBreakdown?.find(
+    (entry) => entry.status === 'returned',
+  )?.count
+  const priorities = []
+  if (numeric(pending) > 0)
+    priorities.push({
+      title: `${formatNumber(pending)} orders are pending`,
+      evidence: 'These orders are still waiting in the fulfillment queue.',
+      action: 'Review pending orders and check dispatch dates.',
+      button: 'Review orders',
+      target: 'store',
+      severity: 'medium',
+    })
+  if (
+    numeric(stats?.synced) !== null &&
+    numeric(stats?.totalSources) !== null &&
+    stats.synced < stats.totalSources
+  )
+    priorities.push({
+      title: 'Some store sources have not synced',
+      evidence: `${stats.synced} of ${stats.totalSources} sources are available.`,
+      action: 'Review source status before making a price change.',
+      button: 'Check sources',
+      target: 'store',
+      severity: 'high',
+    })
+  if (numeric(returned) > 0)
+    priorities.push({
+      title: `${formatNumber(returned)} returns to review`,
+      evidence: 'Returns reduce completed sales in this period.',
+      action: 'Review fulfillment performance and affected listings.',
+      button: 'Review returns',
+      target: 'store',
+    })
+  if (priorities.length < 3 && numeric(stats?.products) > 0)
+    priorities.push({
+      title: 'Compare your products with the market',
+      evidence: `${formatNumber(stats.products)} products in your catalog.`,
+      action:
+        'Check a product against competitor prices before your next update.',
+      button: 'Explore products',
+      target: 'product',
+    })
   return (
-    <div className="flex h-48 items-end gap-1.5 rounded-lg border border-[#e5e7eb] bg-[#fafbfc] px-3 py-3">
-      {items.map((item) => {
-        const value = Number(item[valueKey]) || 0
-        return (
-          <div key={item.date} className="flex min-w-0 flex-1 flex-col items-center gap-2">
-            <div className="flex h-40 w-full items-end">
-              <div
-                className="w-full rounded-t-sm bg-[#f85606]"
-                title={`${item.date}: ${value} orders`}
-                style={{ height: `${Math.max(3, (value / max) * 100)}%` }}
-              />
+    <>
+      <PageHeader
+        title="Overview"
+        description={
+          demo
+            ? 'Store data / Last 30 days'
+            : stats?.lastSyncedAt
+              ? `Last synced ${formatDate(stats.lastSyncedAt, true)} / Last 30 days`
+              : 'Your store performance and priorities for today.'
+        }
+      >
+        {connected ? (
+          <Button
+            icon={RefreshCw}
+            variant="secondary"
+            loading={loading}
+            onClick={refresh}
+          >
+            Refresh
+          </Button>
+        ) : (
+          <Button icon={PlugZap} loading={working} onClick={connect}>
+            Connect Daraz
+          </Button>
+        )}
+      </PageHeader>
+      {loading && !stats ? (
+        <Skeleton label="Loading store performance" />
+      ) : (
+        <>
+          {!connected && (
+            <div className="connection-note">
+              <span>
+                {demo
+                  ? 'Your store is not connected. You are exploring a sample store.'
+                  : 'Your store is not connected. Connect Daraz to see your performance.'}
+              </span>
+              {demo && <DemoIndicator />}
             </div>
+          )}
+          <section
+            className="priorities-section"
+            aria-labelledby="priorities-heading"
+          >
+            <div className="section-heading">
+              <h2 id="priorities-heading">Today's priorities</h2>
+              <span className="muted">
+                {priorities.length
+                  ? `${Math.min(3, priorities.length)} to review`
+                  : 'Getting started'}
+              </span>
+            </div>
+            <div className="priority-list">
+              {priorities.length ? (
+                priorities
+                  .slice(0, 3)
+                  .map((priority, index) => (
+                    <PriorityRow
+                      key={priority.title}
+                      {...priority}
+                      number={index + 1}
+                      onAction={() => onNavigate(priority.target)}
+                    />
+                  ))
+              ) : (
+                <EmptyState
+                  title={
+                    connected
+                      ? 'No priorities available yet'
+                      : 'Bring your store into view'
+                  }
+                >
+                  {connected
+                    ? 'Refresh your store or run a review in Store Insights.'
+                    : 'Authorize your store to see orders, products, and pricing opportunities.'}
+                </EmptyState>
+              )}
+            </div>
+          </section>
+          <div className="kpi-strip">
+            <Kpi
+              label="Orders"
+              value={formatNumber(stats?.ordersLast30Days)}
+              detail="Last 30 days"
+            />
+            <Kpi
+              label="Revenue"
+              value={formatCurrency(stats?.revenue)}
+              detail="Last 30 days"
+            />
+            <Kpi
+              label="Products"
+              value={formatNumber(stats?.products)}
+              detail="In your catalog"
+            />
+            <Kpi
+              label="Pending orders"
+              value={formatNumber(pending)}
+              detail="Awaiting fulfillment"
+            />
           </div>
-        )
-      })}
-    </div>
+          <section className="overview-analysis" aria-label="Store activity">
+            <div className="overview-chart">
+              <Tabs
+                label="Order activity"
+                tabs={[
+                  { id: 'trend', label: 'Order trend' },
+                  { id: 'fulfillment', label: 'Fulfillment' },
+                ]}
+                value={chartTab}
+                onChange={setChartTab}
+              >
+                {chartTab === 'trend' ? (
+                  <>
+                    <div className="section-heading">
+                      <p>Last 30 days</p>
+                      <label className="check-field cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={barView}
+                          onChange={(e) => setBarView(e.target.checked)}
+                        />
+                        Bar view
+                      </label>
+                    </div>
+                    <OrderTrend
+                      items={stats?.charts?.dailyOrders || []}
+                      bars={barView}
+                    />
+                  </>
+                ) : (
+                  <StatusDistribution
+                    items={stats?.charts?.statusBreakdown || []}
+                  />
+                )}
+              </Tabs>
+            </div>
+            <div className="top-products">
+              <div className="section-heading">
+                <h2>Best sellers</h2>
+                <IconButton
+                  icon={ArrowRight}
+                  label="View products"
+                  onClick={() => onNavigate('product')}
+                />
+              </div>
+              {stats?.charts?.topProducts?.length ? (
+                stats.charts.topProducts.slice(0, 4).map((product, index) => (
+                  <button
+                    className="top-product-row"
+                    key={product.sku || product.title}
+                    onClick={() => onNavigate('product', product.sku)}
+                  >
+                    <span>{String(index + 1).padStart(2, '0')}</span>
+                    <div>
+                      <strong title={product.title}>{product.title}</strong>
+                      <small>{formatNumber(product.units)} units</small>
+                    </div>
+                    <b>
+                      {formatNumber(product.orders)}
+                      <small>orders</small>
+                    </b>
+                  </button>
+                ))
+              ) : (
+                <EmptyState title="No best sellers yet">
+                  Product sales will appear when item-level orders are
+                  available.
+                </EmptyState>
+              )}
+              {stats?.charts?.topProducts?.length > 4 && (
+                <Disclosure title="All best sellers">
+                  {stats.charts.topProducts.slice(4).map((product) => (
+                    <PriorityRow
+                      key={product.sku || product.title}
+                      title={product.title}
+                      evidence={`${formatNumber(product.orders)} orders / ${formatNumber(product.units)} units`}
+                      onAction={() => onNavigate('product', product.sku)}
+                    />
+                  ))}
+                </Disclosure>
+              )}
+            </div>
+          </section>
+        </>
+      )}
+    </>
   )
 }
 
-const LineTrend = ({ items = [] }) => {
-  const values = items.map((item) => Number(item.orders) || 0)
-  const max = Math.max(1, ...values)
-  const points = values.map((value, index) => {
-    const x = values.length === 1 ? 0 : (index / (values.length - 1)) * 100
-    const y = 84 - (value / max) * 68
-    return `${x},${y}`
-  })
-  if (!values.length) return <EmptyState>No trend data available yet.</EmptyState>
-  return (
-    <svg className="analytics-line h-52 w-full" viewBox="0 0 100 90" preserveAspectRatio="none" role="img" aria-label="Thirty day order trend">
-      <path className="area" d={`M0,88 L${points.join(' L')} L100,88 Z`} />
-      <path d={`M${points.join(' L')}`} />
-    </svg>
-  )
-}
-
-const OrderHeatmap = ({ items = [] }) => {
-  const max = Math.max(1, ...items.map((item) => Number(item.orders) || 0))
-  if (!items.length) return <EmptyState>No order heatmap available yet.</EmptyState>
-  return (
-    <div>
-      <div className="heatmap-grid" aria-label="Order activity heatmap">
-        {items.slice(-30).map((item) => {
-          const value = Number(item.orders) || 0
-          const level = Math.max(0, Math.min(4, Math.ceil((value / max) * 4)))
-          return <span key={item.date} className="heatmap-cell" data-level={level} title={`${item.date}: ${value} orders`} />
-        })}
-      </div>
-      <div className="mt-3 flex items-center justify-between text-xs text-[#65707c]">
-        <span>Lower order load</span>
-        <span>Higher order load</span>
-      </div>
-    </div>
-  )
-}
-
-const PieBreakdown = ({ items = [] }) => {
-  const total = items.reduce((sum, item) => sum + (Number(item.count) || 0), 0)
-  if (!total) return <EmptyState>No status breakdown available yet.</EmptyState>
-  const palette = ['#f85606', '#2f6f9f', '#27745d', '#d6a21b', '#6b5aa3']
-  const gradient = items.map((item, index) => {
-    const start = items.slice(0, index).reduce((sum, entry) => sum + ((Number(entry.count) || 0) / total) * 100, 0)
-    const end = start + ((Number(item.count) || 0) / total) * 100
-    return `${palette[index % palette.length]} ${start}% ${end}%`
-  }).join(', ')
-
-  return (
-    <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-      <div className="h-32 w-32 shrink-0 rounded-full border border-[#e5e7eb]" style={{ background: `conic-gradient(${gradient})` }} />
-      <div className="min-w-0 flex-1 space-y-2">
-        {items.map((item, index) => (
-          <div key={item.status} className="flex items-center justify-between gap-3 text-sm">
-            <span className="flex min-w-0 items-center gap-2 text-[#4d5863]">
-              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: palette[index % palette.length] }} />
-              <span className="truncate capitalize">{item.status}</span>
-            </span>
-            <span className="font-semibold text-[#15181d]">{formatNumber(item.count)}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-const TopProducts = ({ items = [] }) => {
-  if (!items.length) return <EmptyState>No hit-selling product yet because this account has no item-level order data in the selected period.</EmptyState>
-  return (
-    <div className="divide-y divide-[#eef0f2] rounded-md border border-[#e1e5e9] bg-white">
-      {items.map((item, index) => (
-          <div key={`${item.sku || item.title}-${index}`} className="flex items-center gap-3 px-4 py-3">
-          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-[#f5f6f8] text-sm font-semibold text-[#4b5563]">{index + 1}</span>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-[#242b33]">{item.title}</p>
-            <p className="mt-0.5 truncate text-xs text-[#8a94a3]">{item.sku || 'No SKU'} with {formatNumber(item.units)} units</p>
-          </div>
-          <span className="text-sm font-semibold text-[#15181d]">{formatNumber(item.orders)}</span>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-function Dashboard({ user, onLogout }) {
-  const initialNotice = new URLSearchParams(window.location.search).get('daraz') === 'connected'
-    ? 'Daraz account connected successfully.'
-    : ''
-  const initialError = new URLSearchParams(window.location.search).get('daraz') === 'error'
-    ? new URLSearchParams(window.location.search).get('message') || 'Daraz connection failed.'
-    : ''
+export default function Dashboard({ user, onLogout }) {
+  const query = new URLSearchParams(window.location.search)
   const [status, setStatus] = useState(null)
   const [loading, setLoading] = useState(true)
   const [working, setWorking] = useState(false)
-  const [notice, setNotice] = useState(initialNotice)
-  const [error, setError] = useState(initialError)
+  const [notice, setNotice] = useState(() =>
+    query.get('daraz') === 'connected'
+      ? 'Daraz account connected successfully.'
+      : '',
+  )
+  const [error, setError] = useState(() =>
+    query.get('daraz') === 'error'
+      ? query.get('message') || 'Daraz connection failed.'
+      : '',
+  )
   const [view, setView] = useState(readDashboardView)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [storeOpen, setStoreOpen] = useState(false)
+  const [confirmDisconnect, setConfirmDisconnect] = useState(false)
+  const [selectedSku, setSelectedSku] = useState('')
+  const [showDemo, setShowDemo] = useState(true)
 
   const loadStatus = useCallback(async () => {
     setLoading(true)
@@ -289,8 +350,10 @@ function Dashboard({ user, onLogout }) {
 
   useEffect(() => {
     let active = true
-    if (window.location.search) window.history.replaceState({}, '', window.location.pathname)
-    darazApi.status()
+    if (window.location.search)
+      window.history.replaceState({}, '', window.location.pathname)
+    darazApi
+      .status()
       .then((result) => {
         if (active) setStatus(result)
       })
@@ -300,8 +363,23 @@ function Dashboard({ user, onLogout }) {
       .finally(() => {
         if (active) setLoading(false)
       })
-    return () => { active = false }
+    return () => {
+      active = false
+    }
   }, [])
+
+  useEffect(() => {
+    const syncView = () => {
+      setView(readDashboardView())
+      setMobileOpen(false)
+    }
+    window.addEventListener('popstate', syncView)
+    return () => window.removeEventListener('popstate', syncView)
+  }, [])
+
+  useEffect(() => {
+    document.title = `${navItems.find((item) => item.id === view)?.label || 'Workspace'} | Daraz IQ`
+  }, [view])
 
   const connect = async () => {
     setWorking(true)
@@ -314,316 +392,311 @@ function Dashboard({ user, onLogout }) {
       setWorking(false)
     }
   }
-
   const disconnect = async () => {
-    if (!window.confirm('Disconnect this Daraz account? Stored access tokens will be removed.')) return
     setWorking(true)
     setError('')
     try {
       await darazApi.disconnect()
       setStatus({ connected: false })
       setNotice('Daraz account disconnected.')
+      setConfirmDisconnect(false)
     } catch (requestError) {
       setError(requestError.message)
     } finally {
       setWorking(false)
     }
   }
-
-  useEffect(() => {
-    const syncView = () => setView(readDashboardView())
-    window.addEventListener('popstate', syncView)
-    return () => window.removeEventListener('popstate', syncView)
-  }, [])
-
-  const changeView = (target) => {
-    const nextPath = dashboardPaths[target] || dashboardPaths.overview
-    if (window.location.pathname !== nextPath) window.history.pushState({}, '', nextPath)
-    setView(target)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+  const changeView = (target, sku) => {
+    const next = dashboardPaths[target] ? target : 'overview'
+    if (window.location.pathname !== dashboardPaths[next])
+      window.history.pushState({}, '', dashboardPaths[next])
+    if (sku) setSelectedSku(sku)
+    setView(next)
+    setMobileOpen(false)
+    window.scrollTo({ top: 0, behavior: 'instant' })
   }
 
-  const sampleMode = !status?.connected
-  const displayStatus = status?.connected ? status : demoStatus
-  const showcaseMode = Boolean(displayStatus?.showcase)
-  const usingDemoData = sampleMode || showcaseMode
-  const connection = displayStatus?.connection
-  const stats = displayStatus?.stats
-  const revenueValue = stats?.revenue ?? (sampleMode ? demoStatus.stats.revenue : null)
-  const navClass = (target) => `flex h-10 w-full cursor-pointer items-center gap-3 rounded-md px-3 text-sm font-medium transition duration-200 ${
-    view === target
-      ? 'bg-[#20252c] text-white'
-      : 'text-[#667085] hover:bg-[#f3f4f6] hover:text-[#20252c]'
-  }`
-  const mobileNavClass = (target) => `grid h-9 min-w-9 flex-1 cursor-pointer place-items-center rounded-md transition ${
-    view === target
-      ? 'bg-[#20252c] text-white'
-      : 'text-[#667085] hover:bg-[#f3f4f6] hover:text-[#20252c]'
-  }`
+  const connected = Boolean(status?.connected)
+  const demo = Boolean(status?.showcase || (!connected && status && showDemo))
+  const stats = demo && !connected ? demoStatus.stats : status?.stats
+  const label = navItems.find((item) => item.id === view)?.label
+  const navigation = (
+    <nav className="workspace-nav" aria-label="Workspace">
+      {navItems.map(({ id, label: name, icon: Icon }) => (
+        <a
+          key={id}
+          href={dashboardPaths[id]}
+          className={`${id === view ? 'active' : ''} ${id === 'mcp' ? 'nav-divider' : ''}`}
+          aria-current={id === view ? 'page' : undefined}
+          title={name}
+          onClick={(event) => {
+            if (!event.metaKey && !event.ctrlKey && !event.shiftKey) {
+              event.preventDefault()
+              changeView(id)
+            }
+          }}
+        >
+          <Icon size={18} />
+          <span>{name}</span>
+        </a>
+      ))}
+    </nav>
+  )
 
   return (
-    <div className="seller-console min-h-screen bg-[#f7f8fa] text-[#15181d]">
-      <aside className="fixed inset-y-0 left-0 z-20 hidden w-[248px] border-r border-[#e5e7eb] bg-white lg:flex lg:flex-col">
-        <div className="flex h-16 items-center gap-3 border-b border-[#eef0f2] px-5">
-          <BrandMark />
-        </div>
-        <nav className="flex-1 space-y-1 px-3 py-4">
-          {navItems.map((item) => {
-            const Icon = item.icon
-            return (
-              <button key={item.id} onClick={() => changeView(item.id)} className={navClass(item.id)}>
-                <Icon size={17} /> {item.label}
-              </button>
-            )
-          })}
-        </nav>
-        <div className="border-t border-[#eef0f2] p-4">
-          <div className="flex items-center gap-3">
-            {user.avatarUrl
-              ? <img src={user.avatarUrl} alt="" className="h-9 w-9 rounded-full object-cover" referrerPolicy="no-referrer" />
-              : <span className="grid h-9 w-9 place-items-center rounded-full bg-[#f0f2f4] text-sm font-semibold text-[#4b5563]">{user.name.charAt(0).toUpperCase()}</span>}
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-[#15181d]">{user.name}</p>
-              <p className="truncate text-xs text-[#8a94a3]">{user.email}</p>
+    <div className="seller-console">
+      <a className="skip-link" href="#workspace-main">
+        Skip to content
+      </a>
+      <aside className="workspace-sidebar">
+        <a
+          href="/dashboard"
+          className="sidebar-brand"
+          onClick={(e) => {
+            e.preventDefault()
+            changeView('overview')
+          }}
+        >
+          <Brand />
+        </a>
+        <div className="workspace-label">SELLER WORKSPACE</div>
+        {navigation}
+        <div className="sidebar-bottom">
+          <button className="sidebar-help" onClick={() => changeView('mcp')}>
+            <CircleHelp size={17} />
+            <span>Connections & help</span>
+          </button>
+          <details
+            className="account-menu"
+            onKeyDown={(event) => {
+              if (event.key === 'Escape') {
+                event.currentTarget.open = false
+                event.currentTarget.querySelector('summary').focus()
+              }
+            }}
+            onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget))
+                event.currentTarget.open = false
+            }}
+          >
+            <summary aria-label="Account menu">
+              <span className="account-avatar">
+                {(user.name || 'S').charAt(0).toUpperCase()}
+              </span>
+              <span className="account-label">
+                My account<small>Seller workspace</small>
+              </span>
+              <ChevronDown size={15} />
+            </summary>
+            <div className="account-popover">
+              <p>{user.name || 'Seller'}</p>
+              <p className="muted">{user.email}</p>
+              <Button
+                variant="ghost"
+                icon={Settings}
+                onClick={() => changeView('settings')}
+              >
+                Settings
+              </Button>
+              <Button variant="ghost" icon={LogOut} onClick={onLogout}>
+                Sign out
+              </Button>
             </div>
-            <button onClick={onLogout} aria-label="Sign out" title="Sign out" className="grid h-8 w-8 cursor-pointer place-items-center rounded-md text-[#667085] transition hover:bg-[#f3f4f6] hover:text-[#20252c]">
-              <LogOut size={17} />
-            </button>
-          </div>
+          </details>
         </div>
       </aside>
-
-      <div className="lg:pl-[248px]">
-        <header className="border-b border-[#e5e7eb] bg-white px-4 py-3 sm:px-6 lg:hidden">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex min-w-0 items-center gap-3">
-              <BrandMark compact />
-              <span className="truncate font-semibold text-[#15181d]">daraziq.store</span>
-            </div>
-            <button onClick={onLogout} aria-label="Sign out" className="grid h-9 w-9 shrink-0 cursor-pointer place-items-center rounded-md border border-[#e5e7eb] text-[#667085] transition hover:bg-[#f3f4f6]"><LogOut size={17} /></button>
+      <div className="workspace-body">
+        <header className="workspace-topbar">
+          <div className="topbar-location">
+            <span className="mobile-menu-trigger">
+              <IconButton
+                icon={Menu}
+                label="Open navigation"
+                onClick={() => setMobileOpen(true)}
+              />
+            </span>
+            <span className="desktop-breadcrumb">
+              Workspace <span>/</span>
+            </span>
+            <strong>{label}</strong>
           </div>
-          <div className="app-scrollbar mt-3 flex items-center gap-1 overflow-x-auto rounded-lg border border-[#e5e7eb] bg-white p-1">
-            {navItems.map((item) => {
-              const Icon = item.icon
-              return (
-                <button key={item.id} onClick={() => changeView(item.id)} title={item.label} aria-label={item.label} className={mobileNavClass(item.id)}>
-                  <Icon size={16} />
-                </button>
-              )
-            })}
+          <div className="topbar-status">
+            {demo ? (
+              <DemoIndicator />
+            ) : (
+              status && <StatusBadge>Store data</StatusBadge>
+            )}
+            <button
+              className="store-status-button"
+              onClick={() => setStoreOpen(true)}
+            >
+              <span
+                className={`connection-dot ${connected ? 'connected' : ''}`}
+              />
+              <span>
+                {loading && !status
+                  ? 'Checking store'
+                  : connected
+                    ? 'Daraz connected'
+                    : status
+                      ? 'Store not connected'
+                      : 'Status unavailable'}
+              </span>
+              <ChevronDown size={13} />
+            </button>
           </div>
         </header>
-
-        <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+        <main className="workspace-main" id="workspace-main">
+          <Feedback error={error} onDismiss={() => setError('')} />
           {view === 'settings' ? (
-            <SettingsPanel user={user} />
-          ) : ['store', 'product', 'pricing', 'mcp'].includes(view) ? (
-            <Copilot connected={Boolean(displayStatus?.connected)} user={user} initialFeature={view} showSwitcher={false} />
+            <SettingsPanel />
+          ) : view === 'overview' ? (
+            <Overview
+              stats={stats}
+              connected={connected}
+              demo={demo}
+              connect={connect}
+              working={working}
+              loading={loading}
+              refresh={loadStatus}
+              onNavigate={changeView}
+            />
           ) : (
-            <>
-              <div className="flex flex-col justify-between gap-4 border-b border-[#e5e7eb] pb-5 sm:flex-row sm:items-end">
-                <div>
-                  <p className="text-xs font-medium text-[#8a94a3]">Seller overview</p>
-                  <h1 className="mt-2 text-2xl font-semibold text-[#15181d]">Seller overview</h1>
-                  <p className="mt-1.5 max-w-2xl text-sm text-[#667085]">Start with today’s store signal, then move into the product or price that needs review.</p>
-                  {usingDemoData && (
-                    <p className="mt-2 inline-flex rounded-full border border-[#c6d2dd] bg-white px-3 py-1 text-xs font-medium text-[#4d5965]">
-                      {sampleMode ? 'Sample data is showing until Daraz is connected.' : 'Showcase data is loaded for this account.'}
-                    </p>
-                  )}
-                </div>
-                {!sampleMode ? (
-                  <button onClick={loadStatus} disabled={loading} className="flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md border border-[#d8dde3] bg-white px-3.5 text-sm font-medium text-[#344054] transition hover:bg-[#f8fafc] disabled:cursor-not-allowed disabled:opacity-60">
-                    <RefreshCw size={15} className={loading ? 'animate-spin' : ''} /> Refresh
-                  </button>
-                ) : (
-                  <button onClick={connect} disabled={working} className="flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md bg-[#20252c] px-3.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60">
-                    <PlugZap size={15} /> Connect Daraz
-                  </button>
-                )}
-              </div>
-
-              {(notice || error) && (
-                <div className={`mt-5 flex items-start gap-3 rounded-lg border px-4 py-3 text-sm ${error ? 'border-[#f2c6bc] bg-[#fff8f6] text-[#983720]' : 'border-[#b9dfd2] bg-[#f4fbf8] text-[#236b55]'}`}>
-                  {error ? <CircleAlert size={17} className="mt-0.5 shrink-0" /> : <CheckCircle2 size={17} className="mt-0.5 shrink-0" />}
-                  <span className="flex-1">{error || notice}</span>
-                  <button onClick={() => { setError(''); setNotice('') }} aria-label="Dismiss message" className="grid h-6 w-6 shrink-0 cursor-pointer place-items-center rounded text-current hover:bg-black/5"><X size={14} /></button>
-                </div>
-              )}
-
-              {loading && !status ? (
-                <div className="grid min-h-[420px] place-items-center">
-                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d8dde3] border-t-[#20252c]" />
-                </div>
-              ) : displayStatus?.connected ? (
-                <>
-                  <section className="dashboard-hero-panel mt-6 grid gap-5 rounded-lg p-5 xl:grid-cols-[1fr_360px]">
-                    <div>
-                      <p className="text-sm font-medium text-[#65707c]">Review today</p>
-                      <h2 className="mt-2 text-xl font-semibold text-[#15181d]">Wireless earbuds are above the competitor median.</h2>
-                      <p className="mt-2 max-w-2xl text-sm leading-6 text-[#4d5965]">
-                        The sample workspace recommends reviewing SKU AUR-EB-X7-BLK before the next campaign push.
-                      </p>
-                    </div>
-                    <div className="grid grid-cols-3 gap-3">
-                      <div>
-                        <span className="block text-xs text-[#65707c]">Median</span>
-                        <strong className="dashboard-figure mt-2 block text-lg text-[#15181d]">PKR 4,815</strong>
-                      </div>
-                      <div>
-                        <span className="block text-xs text-[#65707c]">Current</span>
-                        <strong className="dashboard-figure mt-2 block text-lg text-[#15181d]">PKR 5,290</strong>
-                      </div>
-                      <div>
-                        <span className="block text-xs text-[#65707c]">Move</span>
-                        <strong className="dashboard-figure mt-2 block text-lg text-[#c94702]">-8%</strong>
-                      </div>
-                    </div>
-                  </section>
-
-                  <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                    <Metric icon={ShoppingBag} label="Orders" value={formatNumber(stats?.ordersLast30Days)} detail="Last 30 days" description="Recent order volume returned by the Daraz Orders API." tone="bg-[#fff1ea] text-[#d94c06]" />
-                    <Metric icon={Package} label="Products" value={formatNumber(stats?.products)} detail="Total catalog items" description="All products found from the connected Daraz catalog." tone="bg-[#edf5fb] text-[#3477a6]" />
-                    <Metric icon={ShieldCheck} label="Data sources" value={`${stats?.synced ?? 0}/${stats?.totalSources ?? 3}`} detail="Seller, orders, catalog" description="Data sources are Daraz API groups used to build the dashboard." tone="bg-[#edf8f4] text-[#2b8469]" />
-                    <Metric icon={TrendingUp} label="Revenue" value={formatCurrency(revenueValue)} detail={revenueValue ? 'Last 30 days' : 'Run Store Analyst'} description="Revenue represented in the seller workspace." tone="bg-[#f2f0f8] text-[#695aa3]" />
-                  </section>
-
-                  <section className="mt-6 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-                    <div className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white p-5">
-                      <div className="mb-4 flex items-center justify-between gap-3">
-                        <div>
-                          <h2 className="text-base font-semibold text-[#15181d]">Order trend</h2>
-                          <p className="mt-1 text-xs text-[#667085]">Thirty-day direction</p>
-                        </div>
-                        <TrendingUp size={18} className="text-[#2166a5]" />
-                      </div>
-                      <LineTrend items={stats?.charts?.dailyOrders || []} />
-                    </div>
-
-                    <div className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white p-5">
-                      <div className="mb-4 flex items-center justify-between gap-3">
-                        <div>
-                          <h2 className="text-base font-semibold text-[#15181d]">Order heatmap</h2>
-                          <p className="mt-1 text-xs text-[#667085]">Daily load by intensity</p>
-                        </div>
-                        <BarChart3 size={18} className="text-[#1f8a70]" />
-                      </div>
-                      <OrderHeatmap items={stats?.charts?.dailyOrders || []} />
-                    </div>
-                  </section>
-
-                  <section className="mt-6 grid gap-6 xl:grid-cols-[0.88fr_1.12fr]">
-                    <div className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white p-5">
-                      <div className="mb-4 flex items-center justify-between gap-3">
-                        <div>
-                          <h2 className="text-base font-semibold text-[#15181d]">Order status</h2>
-                          <p className="mt-1 text-xs text-[#667085]">Recent fulfillment mix</p>
-                        </div>
-                        <PieChart size={18} className="text-[#2166a5]" />
-                      </div>
-                      <PieBreakdown items={stats?.charts?.statusBreakdown || []} />
-                    </div>
-
-                    <div className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white p-5">
-                      <div className="mb-4 flex items-center justify-between gap-3">
-                        <div>
-                          <h2 className="text-base font-semibold text-[#15181d]">Daily orders</h2>
-                          <p className="mt-1 text-xs text-[#667085]">Bar view for quick comparison</p>
-                        </div>
-                        <BarChart3 size={18} className="text-[#f85606]" />
-                      </div>
-                      <MiniBars items={stats?.charts?.dailyOrders || []} />
-                    </div>
-                  </section>
-
-                  <section className="mt-6 overflow-hidden rounded-lg border border-[#e5e7eb] bg-white p-5">
-                    <div className="mb-4 flex items-center justify-between gap-3">
-                      <div>
-                        <h2 className="text-base font-semibold text-[#15181d]">Top products</h2>
-                        <p className="mt-1 text-xs text-[#667085]">Best sellers detected from item-level order data</p>
-                      </div>
-                      <Trophy size={18} className="text-[#d94c06]" />
-                    </div>
-                    <TopProducts items={stats?.charts?.topProducts || []} />
-                  </section>
-
-                  <section className="mt-6 overflow-hidden rounded-lg border border-[#e5e7eb] bg-white">
-                    <div className="flex flex-col justify-between gap-4 border-b border-[#eef0f2] px-5 py-4 sm:flex-row sm:items-center">
-                      <div>
-                        <h2 className="text-base font-semibold text-[#15181d]">Daraz account</h2>
-                        <p className="mt-1 text-xs text-[#667085]">Connected through Daraz Open Platform</p>
-                      </div>
-                      <span className="inline-flex w-fit items-center gap-2 rounded-full bg-[#edf8f4] px-3 py-1 text-xs font-semibold text-[#26735b]">
-                        <span className="h-1.5 w-1.5 rounded-full bg-[#35a17e]" /> Connected
-                      </span>
-                    </div>
-                    <div className="grid gap-px bg-[#eef0f2] sm:grid-cols-2 lg:grid-cols-3">
-                      <div className="bg-white px-5 py-5">
-                        <p className="text-xs font-medium text-[#8a94a3]">Seller ID</p>
-                        <p className="mt-2 truncate text-sm font-semibold text-[#15181d]">{connection?.sellerId || 'Not provided'}</p>
-                      </div>
-                      <div className="bg-white px-5 py-5">
-                        <p className="text-xs font-medium text-[#8a94a3]">Market</p>
-                        <p className="mt-2 truncate text-sm font-semibold text-[#15181d]">{connection?.country || connection?.accountPlatform || 'Daraz'}</p>
-                      </div>
-                      <div className="bg-white px-5 py-5">
-                        <p className="text-xs font-medium text-[#8a94a3]">Connected on</p>
-                        <p className="mt-2 truncate text-sm font-semibold text-[#15181d]">{formatDate(connection?.connectedAt)}</p>
-                      </div>
-                    </div>
-                    <div className="flex flex-col justify-between gap-4 border-t border-[#eef0f2] px-5 py-4 sm:flex-row sm:items-center">
-                      <p className="text-xs text-[#667085]">Access credentials are encrypted at rest.</p>
-                      {sampleMode ? (
-                        <button onClick={connect} disabled={working} className="flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md bg-[#20252c] px-3.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60">
-                          <PlugZap size={15} /> Connect Daraz
-                        </button>
-                      ) : (
-                        <button onClick={disconnect} disabled={working} className="flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md border border-[#e1b8ae] px-3.5 text-sm font-medium text-[#a33a22] transition hover:bg-[#fff8f6] disabled:cursor-not-allowed disabled:opacity-60">
-                          <Unplug size={15} /> Disconnect account
-                        </button>
-                      )}
-                    </div>
-                  </section>
-                </>
-              ) : (
-                <section className="mt-6 overflow-hidden rounded-lg border border-[#e5e7eb] bg-white">
-                  <div className="grid lg:grid-cols-[1fr_300px]">
-                    <div className="p-6 sm:p-8">
-                      <span className="grid h-10 w-10 place-items-center rounded-lg bg-[#fff0e8] text-[#e34d03]"><PlugZap size={20} /></span>
-                      <h2 className="mt-5 text-xl font-semibold text-[#15181d]">Connect your Daraz seller account</h2>
-                      <p className="mt-3 max-w-lg text-sm leading-6 text-[#667085]">
-                        Authorize daraziq.store through Daraz to view seller details, order volume, and product totals.
-                      </p>
-                      <button onClick={connect} disabled={working} className="mt-6 flex h-10 cursor-pointer items-center gap-2 rounded-md bg-[#f85606] px-4 text-sm font-semibold text-white transition hover:bg-[#db4d05] disabled:cursor-not-allowed disabled:opacity-60">
-                        {working ? 'Opening Daraz...' : 'Connect Daraz'}
-                      </button>
-                    </div>
-                    <div className="border-t border-[#eef0f2] bg-[#fafbfc] p-6 lg:border-l lg:border-t-0">
-                      <p className="text-xs font-semibold text-[#8a94a3]">Connection scope</p>
-                      <div className="mt-5 space-y-4">
-                        {['Seller profile', 'Orders summary', 'Product catalog'].map((label) => (
-                          <div key={label} className="flex items-center gap-3 text-sm text-[#4b5563]">
-                            <CheckCircle2 size={17} className="text-[#399477]" /> {label}
-                          </div>
-                        ))}
-                      </div>
-                      <p className="mt-7 border-t border-[#e5e7eb] pt-5 text-xs leading-5 text-[#667085]">
-                        You can disconnect the account and remove stored credentials at any time.
-                      </p>
-                    </div>
-                  </div>
-                </section>
-              )}
-            </>
+            <Copilot
+              connected={connected}
+              demo={demo}
+              initialFeature={view}
+              selectedSku={selectedSku}
+              onNavigate={changeView}
+              onConnect={connect}
+            />
           )}
-
-          <footer className="mt-8 flex items-center gap-2 text-xs text-[#8a94a3]">
-            <BarChart3 size={14} /> daraziq.store workspace
+          <footer className="workspace-footer">
+            <span>daraziq.store</span>
+            <span>
+              {demo
+                ? 'Data / Sample store'
+                : `Last synced: ${formatDate(status?.stats?.lastSyncedAt, true)}`}
+            </span>
           </footer>
         </main>
       </div>
+      <Dialog
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        title="Workspace navigation"
+        drawer
+      >
+        <Brand />
+        {navigation}
+        <Button icon={LogOut} variant="ghost" onClick={onLogout}>
+          Sign out
+        </Button>
+      </Dialog>
+      <Dialog
+        open={storeOpen}
+        onClose={() => setStoreOpen(false)}
+        title="Daraz connection"
+        drawer
+      >
+        <Feedback error={error} onDismiss={() => setError('')} />
+        <div className="form-stack">
+          <StatusBadge tone={connected ? 'success' : 'neutral'} dot>
+            {connected ? 'Connected' : 'Not connected'}
+          </StatusBadge>
+          <p className="muted">
+            {connected
+              ? 'Your Daraz account is authorized for store, order, and product access.'
+              : 'Connect your Daraz seller account to load your store performance and products.'}
+          </p>
+          {connected && (
+            <dl className="detail-list">
+              <div>
+                <dt>Store</dt>
+                <dd>{status.connection?.sellerName || 'Daraz store'}</dd>
+              </div>
+              <div>
+                <dt>Market</dt>
+                <dd>
+                  {status.connection?.country ||
+                    status.connection?.accountPlatform ||
+                    '-'}
+                </dd>
+              </div>
+              <div>
+                <dt>Connected</dt>
+                <dd>{formatDate(status.connection?.connectedAt)}</dd>
+              </div>
+              <div>
+                <dt>Last synced</dt>
+                <dd>{formatDate(status.stats?.lastSyncedAt, true)}</dd>
+              </div>
+              <div>
+                <dt>Sources synced</dt>
+                <dd>
+                  {formatNumber(status.stats?.synced)} /{' '}
+                  {formatNumber(status.stats?.totalSources)}
+                </dd>
+              </div>
+            </dl>
+          )}
+          {connected ? (
+            <Button
+              variant="danger"
+              icon={Unplug}
+              onClick={() => {
+                setStoreOpen(false)
+                setConfirmDisconnect(true)
+              }}
+            >
+              Disconnect Daraz
+            </Button>
+          ) : (
+            <>
+              <Button loading={working} icon={PlugZap} onClick={connect}>
+                Connect Daraz
+              </Button>
+              <label className="check-field">
+                <input
+                  type="checkbox"
+                  checked={showDemo}
+                  onChange={(e) => setShowDemo(e.target.checked)}
+                />
+                Explore with Store data
+              </label>
+            </>
+          )}
+          <Button
+            variant="secondary"
+            icon={RefreshCw}
+            loading={loading}
+            onClick={loadStatus}
+          >
+            Refresh status
+          </Button>
+          <p className="muted">
+            Access credentials are encrypted at rest. Disconnecting removes the
+            stored Daraz tokens.
+          </p>
+        </div>
+      </Dialog>
+      <ConfirmDialog
+        open={confirmDisconnect}
+        onClose={() => setConfirmDisconnect(false)}
+        onConfirm={disconnect}
+        loading={working}
+        title="Disconnect Daraz?"
+        confirmLabel="Disconnect account"
+        danger
+      >
+        Stored Daraz access tokens will be removed. Reconnect your account to
+        resume store updates.
+      </ConfirmDialog>
+      {notice && (
+        <Feedback toast onDismiss={() => setNotice('')}>
+          {notice}
+        </Feedback>
+      )}
     </div>
   )
 }
-
-export default Dashboard
